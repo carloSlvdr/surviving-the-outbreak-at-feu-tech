@@ -1,0 +1,17 @@
+# MATLAB temporary and generated files
+*.asv
+*.m~
+*.autosave
+slprj/
+codegen/
+
+# Generated simulation outputs
+results/
+data/grids/*.mat
+
+# Keep the grid documentation tracked
+!data/grids/README.md
+
+# Operating-system files
+Thumbs.db
+.DS_Store

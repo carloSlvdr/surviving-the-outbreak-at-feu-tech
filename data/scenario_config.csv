@@ -1,0 +1,5 @@
+scenario_name,organized_evacuation,evacuation_start_hour,description
+Baseline,0,,Normal movement without organized evacuation
+Early Evacuation,1,1,Organized evacuation begins at Hour 1 provisional
+Delayed Evacuation,1,6,Organized evacuation begins at Hour 6 provisional
+

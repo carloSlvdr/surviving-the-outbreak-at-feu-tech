@@ -1,0 +1,17 @@
+connection_id,from_floor_index,to_floor_index,connection_type,capacity_per_step,verification_status
+1,1,2,Stairs,40,Pending verification
+2,2,3,Stairs,40,Pending verification
+3,3,4,Stairs,40,Pending verification
+4,4,5,Stairs,40,Pending verification
+5,5,6,Stairs,40,Pending verification
+6,6,7,Stairs,40,Pending verification
+7,7,8,Stairs,40,Pending verification
+8,8,9,Stairs,40,Pending verification
+9,9,10,Stairs,40,Pending verification
+10,10,11,Stairs,40,Pending verification
+11,11,12,Stairs,40,Pending verification
+12,12,13,Stairs,40,Pending verification
+13,13,14,Stairs,40,Pending verification
+14,14,15,Stairs,40,Pending verification
+15,15,16,Stairs,40,Pending verification
+

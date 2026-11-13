@@ -1,0 +1,3 @@
+exit_id,floor_index,exit_label,capacity_per_step,verification_status
+1,1,Primary Ground Exit,60,Pending verification
+

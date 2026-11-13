@@ -1,0 +1,18 @@
+floor_index,floor_label,main_function,reference_status,layout_source
+1,Ground Floor,Garage Parking Access and Exits,Missing,Assumption required
+2,2nd Floor,Student Plaza,Available,Venue Floor Plans Compilation
+3,3rd Floor,Swimming Pool and Recreation,Available,Venue Floor Plans Compilation
+4,4th Floor,Classrooms and Rooms,Missing,Assumption required
+5,5th Floor,Classrooms and Rooms,Missing,Assumption required
+6,6th Floor,Classrooms and Rooms,Missing,Assumption required
+7,7th Floor,Classrooms and Rooms,Missing,Assumption required
+8,8th Floor,Cafeteria Only,Available,Venue Floor Plans Compilation
+9,9th Floor,Classrooms and Rooms,Missing,Assumption required
+10,10th Floor,Classrooms and Rooms,Missing,Assumption required
+11,11th Floor,Classrooms and Rooms,Missing,Assumption required
+12,12th Floor,Classrooms and Rooms,Missing,Assumption required
+13,14th Floor,Library,Available,Venue Floor Plans Compilation
+14,15th Floor,Registrar Accounting and Offices,Missing,Assumption required
+15,16th Floor,Offices and Audio Visual Room,Partial,Venue Floor Plans Compilation
+16,17th Floor,Gymnasium and Multipurpose Room,Available,Venue Floor Plans Compilation
+

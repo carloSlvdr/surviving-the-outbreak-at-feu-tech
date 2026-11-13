@@ -1,0 +1,10 @@
+{
+  "MATLAB.installPath": "C:\\Program Files\\MATLAB\\R2026a",
+  "files.associations": {
+    "*.m": "matlab"
+  },
+  "files.exclude": {
+    "**/*.asv": true
+  }
+}
+
