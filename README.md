@@ -42,6 +42,12 @@ Build the 16-floor spatial framework:
 matlab -batch "buildModelFramework"
 ```
 
+Run the spatial grid scenarios:
+
+```powershell
+matlab -batch "runGridProject"
+```
+
 Generated CSV summaries and PNG charts are written to `results/`.
 
 ## Project map
@@ -53,6 +59,7 @@ Generated CSV summaries and PNG charts are written to `results/`.
 | `docs/model-framework.md` | Spatial framework architecture, grid contract, and next steps |
 | `docs/model-specification.md` | Current mathematical and behavioral specification |
 | `data/` | Floor, population, connection, exit, and scenario datasets |
+| `references/` | Instructions for private local proposal and floor-plan references |
 | `config/defaultConfig.m` | Centralized provisional modeling parameters |
 | `src/+outbreak/` | MATLAB simulation package |
 | `tests/` | Automated model checks |
@@ -67,4 +74,6 @@ Infected + Non-Infected + Escaped = 4,000
 ```
 
 All numerical behavior parameters are centralized and marked provisional until the group approves or sources them. Architectural assumptions must remain distinguishable from verified floor-plan information.
+
+The supplied plans currently support six plan-derived schematic levels. The remaining ten levels use labeled placeholders. Private architectural PDFs are intentionally excluded from the public GitHub repository.
 

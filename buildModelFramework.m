@@ -21,5 +21,6 @@ writetable(validationReport, fullfile(projectRoot, "results", "framework", "buil
 
 fprintf('Built and validated a %d-floor grid framework with %d agents.\n', ...
     numel(building.floors), height(agents));
-fprintf('Placeholder grids are in %s\n', fullfile(projectRoot, "data", "grids"));
+fprintf('Six plan-derived schematics and ten placeholder grids are in %s\n', ...
+    fullfile(projectRoot, "data", "grids"));
 

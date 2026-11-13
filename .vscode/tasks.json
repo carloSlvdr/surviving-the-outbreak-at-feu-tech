@@ -20,6 +20,15 @@
       "problemMatcher": []
     },
     {
+      "label": "MATLAB: Run grid project",
+      "type": "shell",
+      "command": "matlab",
+      "args": ["-batch", "runGridProject"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
       "label": "MATLAB: Run tests",
       "type": "shell",
       "command": "matlab",

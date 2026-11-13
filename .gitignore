@@ -9,6 +9,10 @@ codegen/
 results/
 data/grids/*.mat
 
+# Private architectural and proposal references
+references/private/
+tmp/
+
 # Keep the grid documentation tracked
 !data/grids/README.md
 

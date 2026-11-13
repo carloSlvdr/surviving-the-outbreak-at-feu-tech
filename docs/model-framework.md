@@ -12,9 +12,9 @@ The framework separates the building, agents, behavior, simulation control, expe
 | Input data | Floors, occupancy, connections, exits, scenarios | `data/*.csv` |
 | Building | Sixteen floor grids and vertical connections | `outbreak.buildBuildingModel` |
 | Agents | State and valid spatial placement | `outbreak.initializeGridAgents` |
-| Behavior | Movement, infection, evacuation | Floor-level prototype exists; grid behavior is next |
-| Simulation | Time stepping and conservation | `outbreak.runScenario` |
-| Experiments | Three scenario execution | `runProject.m` |
+| Behavior | Grid movement, stair descent, contact infection, and exits | `outbreak.runGridScenario` |
+| Simulation | Time stepping and conservation | `outbreak.runScenario` and `outbreak.runGridScenario` |
+| Experiments | Three scenario execution | `runProject.m` and `runGridProject.m` |
 | Validation | Input, building, placement, and reproducibility checks | `tests/run_all_tests.m` |
 | Outputs | CSV tables and figures | `outbreak.writeScenarioOutputs` |
 
@@ -32,7 +32,9 @@ The framework separates the building, agents, behavior, simulation control, expe
 
 ## Current building status
 
-The framework can generate all 16 required floor records and validate their spatial structure. The generated grids are explicitly marked `Placeholder generated framework`. They provide a working software contract, not architectural representations of FEU Tech.
+The framework generates all 16 required floor records and validates their spatial structure. Six levels use plan-derived schematics based on the supplied PDF: 2nd, 3rd, 8th, 14th, 16th, and 17th. Ten levels remain explicitly marked `Placeholder generated framework`.
+
+Plan-derived schematics preserve major circulation zones and obstacles visible in the supplied drawings, but they are not scale architectural reproductions. Partial drawings use assumed connector locations documented in `data/floor_plan_traceability.csv`.
 
 When an actual plan is digitized, its grid can replace the matching placeholder while preserving the floor index, floor label, cell-code convention, connectors, exits, source, and verification metadata.
 

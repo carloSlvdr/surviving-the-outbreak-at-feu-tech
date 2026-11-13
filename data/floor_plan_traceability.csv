@@ -1,0 +1,7 @@
+floor_index,floor_label,pdf_page,plan_area,coverage,digitization_status,connector_status
+2,2nd Floor,1,Student Plaza,Full represented area,Plan-derived schematic,Stairs and elevators visible
+3,3rd Floor,2,Swimming Pool,Partial floor,Plan-derived schematic,Connectors assumed from shared framework
+8,8th Floor,3,Canteen,Full represented area,Plan-derived schematic,Multiple stairs and elevators visible
+13,14th Floor,7,Library,Partial floor,Plan-derived schematic,Connectors partially visible and supplemented by assumption
+15,16th Floor,4,Audio Visual Room,Partial floor,Plan-derived schematic,Connectors assumed from shared framework
+16,17th Floor,5-6,Multi-Purpose Room and Gymnasium,Two partial areas combined,Plan-derived schematic,Stairs visible and supplemented by assumption

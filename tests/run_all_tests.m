@@ -11,6 +11,9 @@ outbreak.validateInputs(cfg, data);
 building = outbreak.buildBuildingModel(cfg, data);
 buildingReport = outbreak.validateBuildingModel(cfg, building);
 assert(all(buildingReport.framework_validation == "passed"));
+gridSources = string({building.floors.gridSource});
+assert(sum(gridSources == "Plan-derived schematic") == 6);
+assert(sum(gridSources == "Placeholder generated framework") == 10);
 
 gridAgents = outbreak.initializeGridAgents(cfg, building, data.occupancy);
 assert(height(gridAgents) == cfg.NumAgents);
@@ -38,6 +41,14 @@ for scenarioIndex = 1:height(data.scenarios)
     assert(all(firstRun.finalAgents.floor_index(active) >= 1 & firstRun.finalAgents.floor_index(active) <= 16));
     assert(isequal(firstRun.timeSeries, secondRun.timeSeries), "Seed reproducibility failed.");
 end
+
+shortCfg = cfg;
+shortCfg.NumSteps = 12;
+gridRun = outbreak.runGridScenario(shortCfg, data, building, data.scenarios(2, :));
+gridTotals = gridRun.timeSeries.infected + gridRun.timeSeries.non_infected + gridRun.timeSeries.escaped;
+assert(all(gridTotals == cfg.NumAgents));
+gridActive = gridRun.finalAgents.status ~= cfg.Status.Escaped;
+assert(all(gridRun.finalAgents.floor_index(gridActive) >= 1 & gridRun.finalAgents.floor_index(gridActive) <= 16));
 
 fprintf('All initial model tests passed.\n');
 

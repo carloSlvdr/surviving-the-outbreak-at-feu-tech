@@ -27,10 +27,15 @@ for index = 1:numel(selectedFloors)
     nexttile;
     imagesc(building.floors(floorNumber).grid);
     axis image off;
-    title(building.floors(floorNumber).floorLabel);
+    if building.floors(floorNumber).gridSource == "Plan-derived schematic"
+        sourceLabel = "Plan-derived";
+    else
+        sourceLabel = "Placeholder";
+    end
+    title(building.floors(floorNumber).floorLabel + " - " + sourceLabel, 'FontSize', 10);
     clim([double(cfg.Cell.Wall) double(cfg.Cell.Special)]);
 end
-title(layout, 'Placeholder Grid Framework — Not Architectural Floor Plans');
+title(layout, 'Mixed Grid Framework - Plan-Derived Schematics and Placeholders', 'FontSize', 14);
 colormap(fig, [0.10 0.10 0.10; 0.90 0.90 0.90; 0.65 0.80 1.00; ...
     1.00 0.65 0.20; 0.65 0.35 0.85; 0.20 0.75 0.30; 0.95 0.85 0.25]);
 exportgraphics(fig, fullfile(frameworkDirectory, "grid_framework_preview.png"), 'Resolution', 160);

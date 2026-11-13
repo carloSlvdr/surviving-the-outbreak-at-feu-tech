@@ -10,6 +10,9 @@ floorTemplate = struct( ...
     'referenceStatus', "", ...
     'layoutSource', "", ...
     'gridSource', "Placeholder generated framework", ...
+    'sourcePdfPage', "", ...
+    'planCoverage', "Not available", ...
+    'connectorStatus', "Framework assumption", ...
     'grid', zeros(cfg.GridRows, cfg.GridColumns, 'uint8'));
 floors = repmat(floorTemplate, numFloors, 1);
 
@@ -19,7 +22,16 @@ for floorNumber = 1:numFloors
     floors(floorNumber).mainFunction = string(data.floors.main_function(floorNumber));
     floors(floorNumber).referenceStatus = string(data.floors.reference_status(floorNumber));
     floors(floorNumber).layoutSource = string(data.floors.layout_source(floorNumber));
-    floors(floorNumber).grid = createPlaceholderGrid(cfg, floorNumber);
+    traceabilityRow = find(data.planTraceability.floor_index == floorNumber, 1);
+    if isempty(traceabilityRow)
+        floors(floorNumber).grid = createPlaceholderGrid(cfg, floorNumber);
+    else
+        floors(floorNumber).gridSource = "Plan-derived schematic";
+        floors(floorNumber).sourcePdfPage = string(data.planTraceability.pdf_page(traceabilityRow));
+        floors(floorNumber).planCoverage = string(data.planTraceability.coverage(traceabilityRow));
+        floors(floorNumber).connectorStatus = string(data.planTraceability.connector_status(traceabilityRow));
+        floors(floorNumber).grid = outbreak.createPlanDerivedGrid(cfg, floorNumber);
+    end
 end
 
 building.projectTitle = cfg.ProjectTitle;
