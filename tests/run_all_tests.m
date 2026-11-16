@@ -12,8 +12,9 @@ building = outbreak.buildBuildingModel(cfg, data);
 buildingReport = outbreak.validateBuildingModel(cfg, building);
 assert(all(buildingReport.framework_validation == "passed"));
 gridSources = string({building.floors.gridSource});
-assert(sum(gridSources == "Plan-derived schematic") == 6);
-assert(sum(gridSources == "Placeholder generated framework") == 10);
+assert(sum(gridSources == "Plan-derived schematic") == 15);
+assert(sum(gridSources == "Abstract evacuation sink") == 1);
+assert(data.occupancy.population(1) == 0);
 
 gridAgents = outbreak.initializeGridAgents(cfg, building, data.occupancy);
 assert(height(gridAgents) == cfg.NumAgents);

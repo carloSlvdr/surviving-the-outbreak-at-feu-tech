@@ -25,7 +25,7 @@ assert(any(groundGrid(:) == cfg.Cell.Exit), "Ground Floor requires an evacuation
 
 for floorNumber = 2:numel(building.floors)
     assert(~any(building.floors(floorNumber).grid(:) == cfg.Cell.Exit), ...
-        "Placeholder upper floors must not define external exits.");
+        "Occupied upper floors must not define external exits.");
 end
 
 report = table((1:16)', floorChecks, ...

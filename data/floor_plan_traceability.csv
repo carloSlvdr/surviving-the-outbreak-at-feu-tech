@@ -1,7 +1,16 @@
-floor_index,floor_label,pdf_page,plan_area,coverage,digitization_status,connector_status
-2,2nd Floor,1,Student Plaza,Full represented area,Plan-derived schematic,Stairs and elevators visible
-3,3rd Floor,2,Swimming Pool,Partial floor,Plan-derived schematic,Connectors assumed from shared framework
-8,8th Floor,3,Canteen,Full represented area,Plan-derived schematic,Multiple stairs and elevators visible
-13,14th Floor,7,Library,Partial floor,Plan-derived schematic,Connectors partially visible and supplemented by assumption
-15,16th Floor,4,Audio Visual Room,Partial floor,Plan-derived schematic,Connectors assumed from shared framework
-16,17th Floor,5-6,Multi-Purpose Room and Gymnasium,Two partial areas combined,Plan-derived schematic,Stairs visible and supplemented by assumption
+floor_index,floor_label,source_reference,plan_area,coverage,digitization_status,connector_status
+2,2nd Floor,FloorPlans.zip/2nd.jpg,Student Plaza and open common areas,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs visible; shared grid connector coordinates normalized
+3,3rd Floor,FloorPlans.zip/3rd.jpg,Pool support and open recreation areas,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs visible; shared grid connector coordinates normalized
+4,4th Floor,FloorPlans.zip/4th.jpg,Classrooms clinic and study areas,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+5,5th Floor,FloorPlans.zip/5th.jpg,Classrooms and administrative offices,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+6,6th Floor,FloorPlans.zip/6th.jpg,Classrooms and study areas,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+7,7th Floor,FloorPlans.zip/7th.jpg,Classrooms and engineering offices,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+8,8th Floor,FloorPlans.zip/8th.jpg,Canteen and event-level circulation,Full photographed evacuation map,Plan-derived schematic,Two distant fire-exit stairs visible; geometry rotated into standard grid orientation
+9,9th Floor,FloorPlans.zip/9th.jpg,Classrooms laboratories and faculty offices,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+10,10th Floor,FloorPlans.zip/10th.jpg,Classrooms and computer engineering offices,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+11,11th Floor,FloorPlans.zip/11th.jpg,Classrooms student lounges and study areas,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+12,12th Floor,FloorPlans.zip/12th.jpg,Classrooms and CSO-MIS office,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+13,14th Floor,FloorPlans.zip/14th.jpg,Library discussion room MRC and ERC,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+14,15th Floor,FloorPlans.zip/15th.jpg,Classrooms offices and service rooms,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs visible; plan orientation mirrored in source
+15,16th Floor,FloorPlans.zip/16th.jpg,Offices classrooms and audio visual rooms,Full photographed evacuation map,Plan-derived schematic,Two fire-exit stairs and elevator core visible
+16,17th Floor,Venue Floor Plans Compilation Deck.pptx.pdf pages 5-6,Multi-Purpose Room and Gymnasium,Two partial areas combined,Plan-derived schematic,Stairs visible and supplemented by shared connector assumption

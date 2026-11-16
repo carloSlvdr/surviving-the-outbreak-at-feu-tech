@@ -16,8 +16,7 @@ cfg.Status.Escaped = uint8(3);
 cfg.InitialInfectedCount = 1;
 cfg.InitialInfectedFloorIndex = 8;
 
-% Standard dimensions for the initial grid framework. These placeholder
-% dimensions can be replaced per floor after the plans are digitized.
+% Standard dimensions for normalized plan-derived schematic grids.
 cfg.GridRows = 40;
 cfg.GridColumns = 60;
 

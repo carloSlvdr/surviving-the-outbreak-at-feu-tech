@@ -1,6 +1,5 @@
 function building = buildBuildingModel(cfg, data)
-%BUILDBUILDINGMODEL Construct the 16-floor spatial model contract.
-% The initial grids are labeled placeholders and are not architectural plans.
+%BUILDBUILDINGMODEL Construct occupied floors plus an abstract exit sink.
 
 numFloors = height(data.floors);
 floorTemplate = struct( ...
@@ -9,10 +8,10 @@ floorTemplate = struct( ...
     'mainFunction', "", ...
     'referenceStatus', "", ...
     'layoutSource', "", ...
-    'gridSource', "Placeholder generated framework", ...
-    'sourcePdfPage', "", ...
-    'planCoverage', "Not available", ...
-    'connectorStatus', "Framework assumption", ...
+    'gridSource', "Plan-derived schematic", ...
+    'sourceReference', "", ...
+    'planCoverage', "", ...
+    'connectorStatus', "", ...
     'grid', zeros(cfg.GridRows, cfg.GridColumns, 'uint8'));
 floors = repmat(floorTemplate, numFloors, 1);
 
@@ -22,16 +21,23 @@ for floorNumber = 1:numFloors
     floors(floorNumber).mainFunction = string(data.floors.main_function(floorNumber));
     floors(floorNumber).referenceStatus = string(data.floors.reference_status(floorNumber));
     floors(floorNumber).layoutSource = string(data.floors.layout_source(floorNumber));
-    traceabilityRow = find(data.planTraceability.floor_index == floorNumber, 1);
-    if isempty(traceabilityRow)
-        floors(floorNumber).grid = createPlaceholderGrid(cfg, floorNumber);
-    else
-        floors(floorNumber).gridSource = "Plan-derived schematic";
-        floors(floorNumber).sourcePdfPage = string(data.planTraceability.pdf_page(traceabilityRow));
-        floors(floorNumber).planCoverage = string(data.planTraceability.coverage(traceabilityRow));
-        floors(floorNumber).connectorStatus = string(data.planTraceability.connector_status(traceabilityRow));
-        floors(floorNumber).grid = outbreak.createPlanDerivedGrid(cfg, floorNumber);
+
+    if floorNumber == 1
+        floors(floorNumber).gridSource = "Abstract evacuation sink";
+        floors(floorNumber).sourceReference = "Ground floor excluded by project scope";
+        floors(floorNumber).planCoverage = "No garage geometry modeled";
+        floors(floorNumber).connectorStatus = "Final stair transition discharges to exit corridor";
+        floors(floorNumber).grid = createAbstractExitGrid(cfg);
+        continue;
     end
+
+    traceabilityRow = find(data.planTraceability.floor_index == floorNumber, 1);
+    assert(~isempty(traceabilityRow), ...
+        "Occupied floor %d requires a plan traceability record.", floorNumber);
+    floors(floorNumber).sourceReference = string(data.planTraceability.source_reference(traceabilityRow));
+    floors(floorNumber).planCoverage = string(data.planTraceability.coverage(traceabilityRow));
+    floors(floorNumber).connectorStatus = string(data.planTraceability.connector_status(traceabilityRow));
+    floors(floorNumber).grid = outbreak.createPlanDerivedGrid(cfg, floorNumber);
 end
 
 building.projectTitle = cfg.ProjectTitle;
@@ -41,38 +47,19 @@ building.floors = floors;
 building.connections = data.connections;
 building.exits = data.exits;
 building.isArchitecturallyVerified = false;
-building.frameworkVersion = "0.1.0";
+building.frameworkVersion = "0.2.0";
 end
 
-function grid = createPlaceholderGrid(cfg, floorNumber)
+function grid = createAbstractExitGrid(cfg)
+% The garage is intentionally absent; this is only an evacuation endpoint.
 rows = cfg.GridRows;
 cols = cfg.GridColumns;
-grid = repmat(cfg.Cell.Room, rows, cols);
-
-grid([1 rows], :) = cfg.Cell.Wall;
-grid(:, [1 cols]) = cfg.Cell.Wall;
-
-middleRows = floor(rows / 2) + (-1:1);
-middleCols = floor(cols / 2) + (-1:1);
-grid(middleRows, 2:cols-1) = cfg.Cell.Walkable;
-grid(2:rows-1, middleCols) = cfg.Cell.Walkable;
-
-partitionColumns = [15 45];
-for column = partitionColumns
-    grid(2:rows-1, column) = cfg.Cell.Wall;
-    grid(middleRows, column) = cfg.Cell.Walkable;
-    grid(8:10, column) = cfg.Cell.Walkable;
-    grid(rows-9:rows-7, column) = cfg.Cell.Walkable;
-end
-
+grid = repmat(cfg.Cell.Wall, rows, cols);
+grid(3, 3:floor(cols/2)) = cfg.Cell.Walkable;
+grid(3:rows-1, floor(cols/2)) = cfg.Cell.Walkable;
+grid(rows-2, floor(cols/2):cols-2) = cfg.Cell.Walkable;
 grid(3, 3) = cfg.Cell.Stair;
 grid(rows-2, cols-2) = cfg.Cell.Stair;
 grid(floor(rows/2), floor(cols/2)) = cfg.Cell.Elevator;
-grid(middleRows, middleCols + 5) = cfg.Cell.Special;
-
-if floorNumber == 1
-    grid(rows, floor(cols/2)) = cfg.Cell.Exit;
-    grid(rows-1, floor(cols/2)) = cfg.Cell.Walkable;
+grid(rows, floor(cols/2)) = cfg.Cell.Exit;
 end
-end
-

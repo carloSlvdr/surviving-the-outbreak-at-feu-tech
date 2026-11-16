@@ -2,7 +2,7 @@
 
 **An Agent-Based Simulation of a Zombie Outbreak**
 
-This repository is the initial implementation foundation for a MATLAB agent-based model of infection spread and evacuation across 16 physical levels of FEU Tech.
+This repository implements a MATLAB agent-based model of infection spread and evacuation across FEU Tech. It models 15 occupied levels spatially and treats the garage-level ground floor only as an abstract evacuation endpoint.
 
 ## Fixed project scope
 
@@ -13,7 +13,7 @@ This repository is the initial implementation foundation for a MATLAB agent-base
 - Three mutually exclusive states: `Infected`, `Non-Infected`, and `Escaped`
 - Three scenarios: Baseline, Early Evacuation, and Delayed Evacuation
 
-The current code is a **floor-level vertical slice**, not the final grid simulation. It validates the population model, state transitions, scenario runner, result export, and conservation rule while detailed floor grids are still being prepared.
+The current code includes a **spatial grid simulation** with plan-guided floor schematics, cell movement, contact infection, stair descent, evacuation, scenario execution, and conservation checks.
 
 ## Run the project
 
@@ -75,5 +75,5 @@ Infected + Non-Infected + Escaped = 4,000
 
 All numerical behavior parameters are centralized and marked provisional until the group approves or sources them. Architectural assumptions must remain distinguishable from verified floor-plan information.
 
-The supplied plans currently support six plan-derived schematic levels. The remaining ten levels use labeled placeholders. Private architectural PDFs are intentionally excluded from the public GitHub repository.
+The supplied plans now support plan-derived schematics for all 15 occupied levels (2nd–12th and 14th–17th; FEU Tech has no 13th-floor label). The ground-floor garage is excluded from occupancy and represented only by a minimal evacuation sink. Source floor-plan images and architectural PDFs remain private and are intentionally excluded from the public GitHub repository.
 

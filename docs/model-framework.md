@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The framework separates the building, agents, behavior, simulation control, experiments, validation, and outputs. This allows verified floor grids to replace placeholders without rewriting the population or scenario logic.
+The framework separates the building, agents, behavior, simulation control, experiments, validation, and outputs. This allows later architectural refinements without rewriting the population or scenario logic.
 
 ## Framework layers
 
@@ -32,11 +32,11 @@ The framework separates the building, agents, behavior, simulation control, expe
 
 ## Current building status
 
-The framework generates all 16 required floor records and validates their spatial structure. Six levels use plan-derived schematics based on the supplied PDF: 2nd, 3rd, 8th, 14th, 16th, and 17th. Ten levels remain explicitly marked `Placeholder generated framework`.
+The framework generates all 16 required level records and validates their spatial structure. All 15 occupied levels use plan-derived schematics based on the supplied evacuation maps. The ground-floor garage has no starting agents and is represented only by an `Abstract evacuation sink` that connects the final stair transition to an exit.
 
-Plan-derived schematics preserve major circulation zones and obstacles visible in the supplied drawings, but they are not scale architectural reproductions. Partial drawings use assumed connector locations documented in `data/floor_plan_traceability.csv`.
+Plan-derived schematics preserve major circulation zones, room bands, open areas, cores, obstacles, and opposing fire-exit stairs visible in the supplied drawings, but they are not scale architectural reproductions. Connector coordinates are normalized across floors for the simulation contract and documented in `data/floor_plan_traceability.csv`.
 
-When an actual plan is digitized, its grid can replace the matching placeholder while preserving the floor index, floor label, cell-code convention, connectors, exits, source, and verification metadata.
+If a drawing is later traced at architectural scale, its grid can replace the matching schematic while preserving the floor index, cell-code convention, connectors, exits, source, and verification metadata.
 
 ## Agent data contract
 
@@ -48,14 +48,9 @@ Each agent has a unique ID, floor index, grid row and column, state code, and in
 buildModelFramework
 ```
 
-This command loads and validates the datasets, builds all 16 placeholder grids, validates their structure and reachability, places all 4,000 agents, and saves the model assets and a visual preview.
+This command loads and validates the datasets, builds 15 plan-derived occupied-floor grids and one abstract exit sink, validates their structure and reachability, places all 4,000 agents above ground, and saves the model assets and a visual preview.
 
-## Next implementation step
+## Current modeling boundary
 
-1. Neighbor-cell movement and collision policy
-2. Shortest-path movement toward stairs and exits
-3. Stair queues and floor transitions
-4. Contact-based infection on neighboring cells
-5. Exit capacity and Escaped transition
-6. Congestion measurements and animation
+Neighbor-cell movement, pathfinding, stair descent, contact infection, and the `Escaped` transition are implemented. Remaining refinement work is calibration: architectural-scale tracing, measured connector and exit capacities, empirically supported infection/movement parameters, congestion metrics, and presentation-quality animation.
 
