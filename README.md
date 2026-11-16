@@ -8,7 +8,8 @@ MATLAB agent-based infection and evacuation simulation using the authoritative h
 - 24 simulated hours at 10-minute state updates
 - independently generated room occupancy with a recorded seed
 - Non-Infected, Infected, and Escaped categories
-- Baseline, Early Evacuation, and Delayed Evacuation scenarios
+- Three controlled outbreak-origin scenarios: Floor 2 Student Plaza, Floor 8 Canteen, and a random Floor 16 office
+- Entrapment pressure after four unsuccessful evacuation hours: bite risk increases by 3 percentage points per hour up to 75%, while still requiring an adjacent infected agent
 - two authorized escape boundaries: Floor-2 Student Plaza and provisional Floor-1 exit
 - regular elevators, emergency stairs, and the green-box elevator modeled separately
 - aggressive infected movement and pursuit with a 12% adjacency-based bite probability

@@ -9,6 +9,10 @@ assert(abs(outbreak.computeBiteProbability(cfg, 1) - 0.12) < 1e-12);
 assert(abs(outbreak.computeBiteProbability(cfg, 2) - 0.2256) < 1e-12);
 assert(abs(outbreak.computeBiteProbability(cfg, 3) - 0.318528) < 1e-12);
 assert(abs(outbreak.computeBiteProbability(cfg, 4) - 0.35) < 1e-12);
+assert(abs(outbreak.computeBiteProbability(cfg, 1, 4) - 0.12) < 1e-12);
+assert(abs(outbreak.computeBiteProbability(cfg, 1, 5) - 0.15) < 1e-12);
+assert(abs(outbreak.computeBiteProbability(cfg, 4, 30) - 0.75) < 1e-12);
+assert(outbreak.computeBiteProbability(cfg, 0, 30) == 0);
 assert(cfg.InfectionGivenBiteProbability == 1.0);
 assert(cfg.InfectedMovementProbability == 0.65 && cfg.InfectedPursuitProbability == 0.75);
 
@@ -29,7 +33,7 @@ assert(height(agents) == initialTotal && numel(unique(agents.agent_id)) == initi
 assert(sum(agents.status == cfg.Status.Infected) == cfg.InitialInfectedCount);
 
 shortCfg = cfg; shortCfg.NumSteps = 6; shortCfg.DurationHours = 1;
-scenario = data.scenarios(data.scenarios.scenario_name == "Early Evacuation", :);
+scenario = data.scenarios(data.scenarios.scenario_name == "Second-Floor Outbreak", :);
 scenario.evacuation_start_hour = 0;
 result = outbreak.runGridScenario(shortCfg, data, building, drawsA, scenario);
 replayed = outbreak.runGridScenario(shortCfg, data, building, drawsA, scenario);

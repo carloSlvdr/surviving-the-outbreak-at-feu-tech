@@ -14,6 +14,7 @@ cfg.Status.Infected = uint8(2);
 cfg.Status.Escaped = uint8(3);
 cfg.InitialInfectedCount = 1;
 cfg.InitialInfectedPhysicalFloor = 8;
+cfg.InitialInfectedRoomPolicy = "any_occupied_space";
 
 cfg.GridRows = 40;
 cfg.GridColumns = 60;
@@ -37,6 +38,11 @@ cfg.InfectionGivenBiteProbability = 1.00;
 cfg.MaximumBiteProbability = 0.35;
 cfg.InfectedMovementProbability = 0.65;
 cfg.InfectedPursuitProbability = 0.75;
+% Provisional entrapment-pressure assumptions. Risk grows only when an
+% infected agent is adjacent; time alone never creates an infection.
+cfg.EntrapmentRiskDelayHours = 4;
+cfg.EntrapmentBiteProbabilityIncreasePerHour = 0.03;
+cfg.EntrapmentMaximumBiteProbability = 0.75;
 cfg.StairCapacityPerStep = 24;
 cfg.RegularElevatorCars = 8;
 cfg.RegularElevatorCapacityPerCar = 15;

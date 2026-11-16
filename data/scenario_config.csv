@@ -1,5 +1,5 @@
-scenario_name,organized_evacuation,evacuation_start_hour,description
-Baseline,0,,Normal movement without organized evacuation
-Early Evacuation,1,1,Organized evacuation begins at Hour 1 provisional
-Delayed Evacuation,1,6,Organized evacuation begins at Hour 6 provisional
+scenario_name,organized_evacuation,evacuation_start_hour,initial_infected_physical_floor,initial_infected_count,initial_infected_room_policy,description
+Second-Floor Outbreak,1,1,2,1,any_occupied_space,One infected begins in the occupied Student Plaza area on Floor 2
+Eighth-Floor Outbreak,1,1,8,1,any_occupied_space,One infected begins in the occupied canteen area on Floor 8
+Sixteenth-Floor Outbreak,1,1,16,1,any_office,One infected begins in a randomly selected occupied office on Floor 16
 

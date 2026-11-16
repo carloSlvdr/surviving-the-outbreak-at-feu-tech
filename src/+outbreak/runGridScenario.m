@@ -2,7 +2,7 @@ function result = runGridScenario(cfg, data, building, roomDraws, scenarioRow)
 %RUNGRIDSCENARIO Execute a reproducible 24-hour spatial scenario.
 
 rng(cfg.RandomSeed, "twister");
-agents = outbreak.initializeGridAgents(cfg, building, data, roomDraws);
+agents = outbreak.initializeGridAgents(cfg, building, data, roomDraws, scenarioRow);
 totalAgents = height(agents);
 numFloors = cfg.NumFloors;
 scenarioName = string(scenarioRow.scenario_name(1));
@@ -49,7 +49,9 @@ for step = 1:cfg.NumSteps
     [agents, stairTransfers(step, :), regularElevatorTransfers(step, :), ...
         greenElevatorTransfers(step, :)] = moveAgents(agents, building, cfg, ...
         evacuationActive, distanceMaps, step);
-    [agents, newBites(step + 1)] = infectAdjacentAgents(agents, cfg, building);
+    hoursSinceEvacuation = max(0, currentHour - evacuationStartHour);
+    [agents, newBites(step + 1)] = infectAdjacentAgents(agents, cfg, building, ...
+        evacuationActive, hoursSinceEvacuation);
     if evacuationActive
         agents = processAuthorizedExits(agents, cfg, building);
     end
@@ -213,7 +215,7 @@ end
 newRow = candidates(selected, 1); newColumn = candidates(selected, 2);
 end
 
-function [agents, successfulBites] = infectAdjacentAgents(agents, cfg, building)
+function [agents, successfulBites] = infectAdjacentAgents(agents, cfg, building, evacuationActive, hoursSinceEvacuation)
 infectedMaps = false(cfg.GridRows, cfg.GridColumns, cfg.NumFloors);
 infectedRows = find(agents.status == cfg.Status.Infected);
 for agentIndex = infectedRows'
@@ -231,7 +233,12 @@ for agentIndex = susceptibleRows'
             adjacent = adjacent + infectedMaps(neighbor(1), neighbor(2), floorIndex);
         end
     end
-    biteProbability = outbreak.computeBiteProbability(cfg, adjacent);
+    if evacuationActive
+        entrapmentHours = hoursSinceEvacuation;
+    else
+        entrapmentHours = 0;
+    end
+    biteProbability = outbreak.computeBiteProbability(cfg, adjacent, entrapmentHours);
     infectionProbability = biteProbability * cfg.InfectionGivenBiteProbability;
     newlyInfected(agentIndex) = adjacent > 0 && rand < infectionProbability;
 end
