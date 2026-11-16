@@ -11,6 +11,8 @@ MATLAB agent-based infection and evacuation simulation using the authoritative h
 - Baseline, Early Evacuation, and Delayed Evacuation scenarios
 - two authorized escape boundaries: Floor-2 Student Plaza and provisional Floor-1 exit
 - regular elevators, emergency stairs, and the green-box elevator modeled separately
+- aggressive infected movement and pursuit with a 12% adjacency-based bite probability
+- guaranteed infection after a successful bite, capped at 35% bite probability per update
 
 Floors 13 and 17 are not part of the model. Floor 12 has no initial room population because its supplied drawing is mislabeled. Floor 1 is provisional because no drawing was supplied.
 

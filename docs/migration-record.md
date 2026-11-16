@@ -12,5 +12,6 @@ Date: 2026-11-16
 - Added the Floor-2 Student Plaza entrance as the second authorized escape boundary.
 - Added evidence and uncertainty records for mislabeled, incomplete, or conflicting drawings.
 - Wrote new outputs under `results/authoritative_scenarios`; older `results/grid_scenarios` outputs are obsolete.
+- Replaced proximity-only infection with aggressive pursuit, a 12% bite opportunity per adjacent infected agent, a 35% per-update cap, and guaranteed infection after a successful bite.
 
 The current normalized grids are drawing-derived topological reconstructions, not scale architectural plans.

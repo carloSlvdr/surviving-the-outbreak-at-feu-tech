@@ -31,8 +31,12 @@ cfg.TraversableCellCodes = uint8(1:8);
 % Provisional behavior; values are simulation assumptions, not measured data.
 cfg.NormalMovementProbability = 0.08;
 cfg.EvacuationMovementProbability = 0.70;
-cfg.InfectionRate = 0.08;
-cfg.MaximumInfectionProbability = 0.20;
+% Aggressive-zombie bite and pursuit behavior.
+cfg.BiteProbability = 0.12;
+cfg.InfectionGivenBiteProbability = 1.00;
+cfg.MaximumBiteProbability = 0.35;
+cfg.InfectedMovementProbability = 0.65;
+cfg.InfectedPursuitProbability = 0.75;
 cfg.StairCapacityPerStep = 24;
 cfg.RegularElevatorCars = 8;
 cfg.RegularElevatorCapacityPerCar = 15;

@@ -26,6 +26,7 @@ infected = zeros(cfg.NumSteps + 1, 1);
 nonInfected = zeros(cfg.NumSteps + 1, 1);
 escaped = zeros(cfg.NumSteps + 1, 1);
 indoor = zeros(cfg.NumSteps + 1, 1);
+newBites = zeros(cfg.NumSteps + 1, 1);
 occupancyVisits = zeros(cfg.GridRows, cfg.GridColumns, numFloors, 'uint32');
 infectedVisits = zeros(cfg.GridRows, cfg.GridColumns, numFloors, 'uint32');
 floorPopulation = zeros(cfg.NumSteps + 1, numFloors);
@@ -48,7 +49,7 @@ for step = 1:cfg.NumSteps
     [agents, stairTransfers(step, :), regularElevatorTransfers(step, :), ...
         greenElevatorTransfers(step, :)] = moveAgents(agents, building, cfg, ...
         evacuationActive, distanceMaps, step);
-    agents = infectAdjacentAgents(agents, cfg, building);
+    [agents, newBites(step + 1)] = infectAdjacentAgents(agents, cfg, building);
     if evacuationActive
         agents = processAuthorizedExits(agents, cfg, building);
     end
@@ -64,8 +65,9 @@ end
 result.scenarioName = scenarioName;
 result.generatedInitialTotal = totalAgents;
 result.roomDraws = roomDraws;
-result.timeSeries = table(timeHours, infected, nonInfected, escaped, indoor, ...
-    'VariableNames', {'time_hours', 'infected', 'non_infected', 'escaped', 'indoor_population'});
+result.timeSeries = table(timeHours, infected, nonInfected, escaped, indoor, newBites, cumsum(newBites), ...
+    'VariableNames', {'time_hours', 'infected', 'non_infected', 'escaped', 'indoor_population', ...
+    'new_bite_infections', 'cumulative_bite_infections'});
 result.finalAgents = agents;
 result.spatial.occupancyVisits = occupancyVisits;
 result.spatial.infectedVisits = infectedVisits;
@@ -96,6 +98,20 @@ greenCounts = zeros(1, numFloors);
 greenTotal = 0;
 moveOrder = activeRows(randperm(numel(activeRows)));
 directions = int16([-1 0; 1 0; 0 -1; 0 1]);
+pursuitMaps = cell(numFloors, 1);
+for targetFloor = 1:numFloors
+    susceptible = find(agents.floor_index == targetFloor & agents.status == cfg.Status.NonInfected);
+    if isempty(susceptible)
+        pursuitMaps{targetFloor} = [];
+        continue;
+    end
+    targetMask = false(cfg.GridRows, cfg.GridColumns);
+    indices = sub2ind([cfg.GridRows cfg.GridColumns], ...
+        double(agents.grid_row(susceptible)), double(agents.grid_column(susceptible)));
+    targetMask(indices) = true;
+    pursuitMaps{targetFloor} = outbreak.computeDistanceMap( ...
+        building.floors(targetFloor).grid, targetMask, cfg.TraversableCellCodes);
+end
 
 for agentIndex = moveOrder'
     floorIndex = double(agents.floor_index(agentIndex));
@@ -132,7 +148,14 @@ for agentIndex = moveOrder'
         end
     end
 
-    if evacuationActive && rand < cfg.EvacuationMovementProbability
+    if agents.status(agentIndex) == cfg.Status.Infected
+        if rand >= cfg.InfectedMovementProbability
+            continue;
+        end
+        guidedPursuit = ~isempty(pursuitMaps{floorIndex}) && rand < cfg.InfectedPursuitProbability;
+        [newRow, newColumn] = bestNeighbor(row, column, grid, occupied(:, :, floorIndex), ...
+            pursuitMaps{floorIndex}, cfg.TraversableCellCodes, directions, guidedPursuit);
+    elseif evacuationActive && rand < cfg.EvacuationMovementProbability
         distanceMap = distanceMaps{floorIndex};
         [newRow, newColumn] = bestNeighbor(row, column, grid, occupied(:, :, floorIndex), ...
             distanceMap, cfg.TraversableCellCodes, directions, true);
@@ -190,7 +213,7 @@ end
 newRow = candidates(selected, 1); newColumn = candidates(selected, 2);
 end
 
-function agents = infectAdjacentAgents(agents, cfg, building)
+function [agents, successfulBites] = infectAdjacentAgents(agents, cfg, building)
 infectedMaps = false(cfg.GridRows, cfg.GridColumns, cfg.NumFloors);
 infectedRows = find(agents.status == cfg.Status.Infected);
 for agentIndex = infectedRows'
@@ -208,11 +231,13 @@ for agentIndex = susceptibleRows'
             adjacent = adjacent + infectedMaps(neighbor(1), neighbor(2), floorIndex);
         end
     end
-    probability = min(cfg.MaximumInfectionProbability, 1 - (1 - cfg.InfectionRate) ^ adjacent);
-    newlyInfected(agentIndex) = adjacent > 0 && rand < probability;
+    biteProbability = outbreak.computeBiteProbability(cfg, adjacent);
+    infectionProbability = biteProbability * cfg.InfectionGivenBiteProbability;
+    newlyInfected(agentIndex) = adjacent > 0 && rand < infectionProbability;
 end
 agents.status(newlyInfected) = cfg.Status.Infected;
 agents.infection_history(newlyInfected) = true;
+successfulBites = sum(newlyInfected);
 end
 
 function agents = processAuthorizedExits(agents, cfg, building)
