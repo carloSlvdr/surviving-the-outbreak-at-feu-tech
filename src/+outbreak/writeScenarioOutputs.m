@@ -15,9 +15,11 @@ plot(result.timeSeries.time_hours, result.timeSeries.infected, 'r-', 'LineWidth'
 hold on;
 plot(result.timeSeries.time_hours, result.timeSeries.non_infected, 'b-', 'LineWidth', 1.8);
 plot(result.timeSeries.time_hours, result.timeSeries.escaped, 'g-', 'LineWidth', 1.8);
-xlabel('Simulated time (hours)');
-ylabel('Agents');
-title(result.scenarioName + " — Population Progression");
+ax = gca;
+set(ax, 'Color', 'white', 'XColor', 'black', 'YColor', 'black');
+xlabel('Simulated time (hours)', 'Color', 'black');
+ylabel('Agents', 'Color', 'black');
+title(result.scenarioName + " - Population Progression", 'Color', 'black');
 legend('Infected', 'Non-Infected', 'Escaped', 'Location', 'best');
 grid on;
 exportgraphics(fig, fullfile(scenarioDir, "population_progression.png"), 'Resolution', 160);

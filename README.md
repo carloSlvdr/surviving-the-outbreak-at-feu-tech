@@ -50,6 +50,16 @@ matlab -batch "runGridProject"
 
 Generated CSV summaries and PNG charts are written to `results/`.
 
+The spatial run also generates, for every scenario:
+
+- Cumulative occupancy heat-map atlas for all 15 occupied levels
+- Cumulative infected-presence heat-map atlas
+- Floor population-over-time heat map
+- Cumulative stair-traffic chart
+- Floor-level spatial and time-series CSV tables
+- Raw occupancy and infected-visit matrices for every level
+- A split-scale comparison of final outcomes across all scenarios
+
 ## Project map
 
 | Path | Purpose |

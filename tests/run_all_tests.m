@@ -48,6 +48,9 @@ shortCfg.NumSteps = 12;
 gridRun = outbreak.runGridScenario(shortCfg, data, building, data.scenarios(2, :));
 gridTotals = gridRun.timeSeries.infected + gridRun.timeSeries.non_infected + gridRun.timeSeries.escaped;
 assert(all(gridTotals == cfg.NumAgents));
+assert(isequal(size(gridRun.spatial.occupancyVisits), [cfg.GridRows cfg.GridColumns 16]));
+assert(isequal(size(gridRun.spatial.floorPopulation), [shortCfg.NumSteps + 1 16]));
+assert(all(sum(gridRun.spatial.floorPopulation, 2) + gridRun.timeSeries.escaped == cfg.NumAgents));
 gridActive = gridRun.finalAgents.status ~= cfg.Status.Escaped;
 assert(all(gridRun.finalAgents.floor_index(gridActive) >= 1 & gridRun.finalAgents.floor_index(gridActive) <= 16));
 

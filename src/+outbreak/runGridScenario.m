@@ -22,6 +22,12 @@ infected = zeros(cfg.NumSteps + 1, 1);
 nonInfected = zeros(cfg.NumSteps + 1, 1);
 escaped = zeros(cfg.NumSteps + 1, 1);
 [infected(1), nonInfected(1), escaped(1)] = countStates(agents, cfg);
+occupancyVisits = zeros(cfg.GridRows, cfg.GridColumns, 16, 'uint32');
+infectedVisits = zeros(cfg.GridRows, cfg.GridColumns, 16, 'uint32');
+floorPopulation = zeros(cfg.NumSteps + 1, 16);
+stairDemand = zeros(cfg.NumSteps + 1, 16);
+[occupancyVisits, infectedVisits, floorPopulation(1, :), stairDemand(1, :)] = ...
+    recordSpatialState(agents, building, cfg, occupancyVisits, infectedVisits);
 
 for step = 1:cfg.NumSteps
     currentHour = (step - 1) * cfg.TimeStepMinutes / 60;
@@ -32,6 +38,8 @@ for step = 1:cfg.NumSteps
         agents = processGroundExit(agents, cfg, building, data.exits);
     end
     [infected(step + 1), nonInfected(step + 1), escaped(step + 1)] = countStates(agents, cfg);
+    [occupancyVisits, infectedVisits, floorPopulation(step + 1, :), stairDemand(step + 1, :)] = ...
+        recordSpatialState(agents, building, cfg, occupancyVisits, infectedVisits);
     assert(infected(step + 1) + nonInfected(step + 1) + escaped(step + 1) == cfg.NumAgents, ...
         "Population conservation failed at grid step %d.", step);
 end
@@ -40,9 +48,34 @@ result.scenarioName = scenarioName;
 result.timeSeries = table(timeHours, infected, nonInfected, escaped, ...
     'VariableNames', {'time_hours', 'infected', 'non_infected', 'escaped'});
 result.finalAgents = agents;
+result.spatial.occupancyVisits = occupancyVisits;
+result.spatial.infectedVisits = infectedVisits;
+result.spatial.floorPopulation = floorPopulation;
+result.spatial.stairDemand = stairDemand;
+result.spatial.floorLabels = string({building.floors.floorLabel});
 result.summary = table(scenarioName, infected(end), nonInfected(end), escaped(end), ...
     100 * escaped(end) / cfg.NumAgents, ...
     'VariableNames', {'scenario', 'infected', 'non_infected', 'escaped', 'escape_rate_percent'});
+end
+
+function [occupancyVisits, infectedVisits, floorPopulation, stairDemand] = ...
+        recordSpatialState(agents, building, cfg, occupancyVisits, infectedVisits)
+floorPopulation = zeros(1, 16);
+stairDemand = zeros(1, 16);
+activeRows = find(agents.status ~= cfg.Status.Escaped);
+for agentIndex = activeRows'
+    floorIndex = double(agents.floor_index(agentIndex));
+    row = double(agents.grid_row(agentIndex));
+    column = double(agents.grid_column(agentIndex));
+    occupancyVisits(row, column, floorIndex) = occupancyVisits(row, column, floorIndex) + 1;
+    floorPopulation(floorIndex) = floorPopulation(floorIndex) + 1;
+    if agents.status(agentIndex) == cfg.Status.Infected
+        infectedVisits(row, column, floorIndex) = infectedVisits(row, column, floorIndex) + 1;
+    end
+    if building.floors(floorIndex).grid(row, column) == cfg.Cell.Stair
+        stairDemand(floorIndex) = stairDemand(floorIndex) + 1;
+    end
+end
 end
 
 function agents = moveAgents(agents, building, cfg, evacuationActive, distanceToStairs, distanceToExit)

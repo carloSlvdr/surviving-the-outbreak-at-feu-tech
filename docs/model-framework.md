@@ -16,7 +16,7 @@ The framework separates the building, agents, behavior, simulation control, expe
 | Simulation | Time stepping and conservation | `outbreak.runScenario` and `outbreak.runGridScenario` |
 | Experiments | Three scenario execution | `runProject.m` and `runGridProject.m` |
 | Validation | Input, building, placement, and reproducibility checks | `tests/run_all_tests.m` |
-| Outputs | CSV tables and figures | `outbreak.writeScenarioOutputs` |
+| Outputs | CSV tables, population charts, spatial heat maps, and congestion figures | `outbreak.writeScenarioOutputs` and `outbreak.writeGridScenarioOutputs` |
 
 ## Occupancy-grid codes
 
@@ -52,5 +52,5 @@ This command loads and validates the datasets, builds 15 plan-derived occupied-f
 
 ## Current modeling boundary
 
-Neighbor-cell movement, pathfinding, stair descent, contact infection, and the `Escaped` transition are implemented. Remaining refinement work is calibration: architectural-scale tracing, measured connector and exit capacities, empirically supported infection/movement parameters, congestion metrics, and presentation-quality animation.
+Neighbor-cell movement, pathfinding, stair descent, contact infection, the `Escaped` transition, spatial heat maps, floor-time metrics, and stair-traffic outputs are implemented. Remaining refinement work is calibration: architectural-scale tracing, measured connector and exit capacities, empirically supported infection/movement parameters, queue-based congestion metrics, and presentation-quality animation.
 

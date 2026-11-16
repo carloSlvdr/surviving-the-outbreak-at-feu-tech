@@ -19,6 +19,7 @@ summaries = cell(height(data.scenarios), 1);
 for scenarioIndex = 1:height(data.scenarios)
     result = outbreak.runGridScenario(cfg, data, building, data.scenarios(scenarioIndex, :));
     outbreak.writeScenarioOutputs(result, outputRoot);
+    outbreak.writeGridScenarioOutputs(result, building, outputRoot);
     safeName = lower(regexprep(result.scenarioName, "[^A-Za-z0-9]+", "_"));
     writetable(result.finalAgents, fullfile(outputRoot, safeName, "final_agents.csv"));
     summaries{scenarioIndex} = result.summary;
@@ -26,6 +27,7 @@ end
 
 scenarioSummary = vertcat(summaries{:});
 writetable(scenarioSummary, fullfile(outputRoot, "scenario_comparison.csv"));
+outbreak.writeScenarioComparison(scenarioSummary, outputRoot);
 disp(scenarioSummary);
 fprintf('Grid scenario results written to %s\n', outputRoot);
 
