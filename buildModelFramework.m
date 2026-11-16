@@ -1,26 +1,16 @@
-%BUILDMODELFRAMEWORK Build and validate the initial 16-floor grid framework.
-
+%BUILDMODELFRAMEWORK Build and validate the authoritative environment.
 projectRoot = string(fileparts(mfilename('fullpath')));
-addpath(fullfile(projectRoot, "config"));
-addpath(fullfile(projectRoot, "src"));
-
-cfg = defaultConfig();
-data = outbreak.loadProjectData(projectRoot);
+addpath(fullfile(projectRoot, "config")); addpath(fullfile(projectRoot, "src"));
+cfg = defaultConfig(); data = outbreak.loadProjectData(projectRoot);
 outbreak.validateInputs(cfg, data);
-
 building = outbreak.buildBuildingModel(cfg, data);
-validationReport = outbreak.validateBuildingModel(cfg, building);
-agents = outbreak.initializeGridAgents(cfg, building, data.occupancy);
-
-assert(height(agents) == cfg.NumAgents, "Grid initialization must place all agents.");
-assert(sum(agents.status == cfg.Status.Infected) == cfg.InitialInfectedCount);
-assert(sum(agents.status == cfg.Status.NonInfected) == cfg.NumAgents - cfg.InitialInfectedCount);
-
-outbreak.writeBuildingFramework(cfg, building, agents, projectRoot);
-writetable(validationReport, fullfile(projectRoot, "results", "framework", "building_validation.csv"));
-
-fprintf('Built and validated a %d-floor grid framework with %d agents.\n', ...
-    numel(building.floors), height(agents));
-fprintf('Fifteen plan-derived occupied floors and one abstract exit sink are in %s\n', ...
-    fullfile(projectRoot, "data", "grids"));
-
+validationReport = outbreak.validateBuildingModel(cfg, building, data);
+roomDraws = outbreak.generateRoomOccupancy(cfg, data);
+agents = outbreak.initializeGridAgents(cfg, building, data, roomDraws);
+assert(height(agents) == sum(roomDraws.generated_occupancy));
+frameworkDir = fullfile(projectRoot, "results", "authoritative_framework");
+if ~isfolder(frameworkDir), mkdir(frameworkDir); end
+save(fullfile(frameworkDir, "building_model.mat"), 'building', 'cfg', 'roomDraws');
+writetable(validationReport, fullfile(frameworkDir, "building_validation.csv"));
+writetable(roomDraws, fullfile(frameworkDir, "room_occupancy_draws.csv"));
+fprintf('Validated 15 physical floors and generated %d initial agents.\n', height(agents));

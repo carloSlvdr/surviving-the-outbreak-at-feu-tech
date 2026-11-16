@@ -1,36 +1,41 @@
-function agents = initializeGridAgents(cfg, building, occupancy)
-%INITIALIZEGRIDAGENTS Place all agents on valid non-connector cells.
+function agents = initializeGridAgents(cfg, building, data, roomDraws)
+%INITIALIZEGRIDAGENTS Place every generated person in the assigned room.
+
+totalAgents = sum(roomDraws.generated_occupancy);
+agentId = uint32((1:totalAgents)');
+floorIndex = zeros(totalAgents, 1, 'uint8');
+gridRow = zeros(totalAgents, 1, 'uint16');
+gridColumn = zeros(totalAgents, 1, 'uint16');
+status = repmat(cfg.Status.NonInfected, totalAgents, 1);
+roomId = strings(totalAgents, 1);
+infectionHistory = false(totalAgents, 1);
 
 rng(cfg.RandomSeed, "twister");
-agentId = uint32((1:cfg.NumAgents)');
-floorIndex = zeros(cfg.NumAgents, 1, 'uint8');
-gridRow = zeros(cfg.NumAgents, 1, 'uint16');
-gridColumn = zeros(cfg.NumAgents, 1, 'uint16');
-status = repmat(cfg.Status.NonInfected, cfg.NumAgents, 1);
-
 nextAgent = 1;
-spawnCodes = uint8([cfg.Cell.Walkable cfg.Cell.Room cfg.Cell.Special]);
-for floorNumber = 1:numel(building.floors)
-    count = occupancy.population(floorNumber);
-    floorGrid = building.floors(floorNumber).grid;
-    candidates = find(ismember(floorGrid, spawnCodes));
+for roomRow = 1:height(roomDraws)
+    count = roomDraws.generated_occupancy(roomRow);
+    currentFloor = roomDraws.floor_index(roomRow);
+    candidates = find(building.floors(currentFloor).roomMap == roomRow);
     assert(numel(candidates) >= count, ...
-        "Floor %d has fewer spawn cells than assigned agents.", floorNumber);
+        "Room %s has %d cells but requires %d agents.", roomDraws.room_id(roomRow), numel(candidates), count);
     selected = candidates(randperm(numel(candidates), count));
-    [rows, columns] = ind2sub(size(floorGrid), selected);
-    rowsForFloor = nextAgent:(nextAgent + count - 1);
-    floorIndex(rowsForFloor) = uint8(floorNumber);
-    gridRow(rowsForFloor) = uint16(rows);
-    gridColumn(rowsForFloor) = uint16(columns);
+    [rows, columns] = ind2sub([cfg.GridRows cfg.GridColumns], selected);
+    target = nextAgent:(nextAgent + count - 1);
+    floorIndex(target) = uint8(currentFloor);
+    gridRow(target) = uint16(rows);
+    gridColumn(target) = uint16(columns);
+    roomId(target) = roomDraws.room_id(roomRow);
     nextAgent = nextAgent + count;
 end
 
-infectedCandidates = find(floorIndex == cfg.InitialInfectedFloorIndex);
-infectedRows = infectedCandidates(randperm(numel(infectedCandidates), cfg.InitialInfectedCount));
-status(infectedRows) = cfg.Status.Infected;
+infectedFloorIndex = find(cfg.PhysicalFloorIds == cfg.InitialInfectedPhysicalFloor, 1);
+candidates = find(floorIndex == infectedFloorIndex);
+selected = candidates(randperm(numel(candidates), cfg.InitialInfectedCount));
+status(selected) = cfg.Status.Infected;
+infectionHistory(selected) = true;
 
-agents = table(agentId, floorIndex, gridRow, gridColumn, status, floorIndex, ...
+agents = table(agentId, floorIndex, gridRow, gridColumn, status, roomId, ...
+    infectionHistory, floorIndex, ...
     'VariableNames', {'agent_id', 'floor_index', 'grid_row', 'grid_column', ...
-    'status', 'initial_floor_index'});
+    'status', 'initial_room_id', 'infection_history', 'initial_floor_index'});
 end
-

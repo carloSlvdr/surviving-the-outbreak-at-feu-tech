@@ -1,0 +1,22 @@
+physical_floor_id,source_image,feature,interpretation,confidence,uncertainty
+1,none,Ground exit path,Provisional corridor from green elevator to exit,unverified,No Floor-1 drawing supplied
+2,2ND FLOOR.png,Student Plaza entrance,Right-side entrance boundary,verified from drawing,Boundary width normalized
+2,2ND FLOOR.png,Green-box elevator,Service stop shown,verified from drawing,Travel time provisional
+3,3RD FLOOR.png,Gym,Large occupied area,verified from drawing,Scale absent
+3,3RD FLOOR.png,Green-box elevator,Service stop shown,verified from drawing,Travel time provisional
+4,4TH FLOOR.png,Room bands,F401-F411 reconstructed,verified from drawing,Doors inferred toward corridor
+4,4TH FLOOR.png,Clinic F412,Geometry retained but no initial occupancy,verified from drawing,Occupancy range unspecified
+5,5TH FLOOR.png,Room and office bands,Ten classrooms and two offices reconstructed,verified from drawing,Doors inferred
+6,6TH FLOOR.png,Room bands,F601-F612 reconstructed,verified from drawing,Doors inferred
+7,7TH FLOOR.png,Room and office bands,F701-F713 with two offices,verified from drawing,Transport core absent from source
+8,8TH FLOOR.png,Canteen,Requirement-defined occupied zone,unverified,Drawing labels conflict with stated canteen function
+9,9TH FLOOR.png,Rooms and faculty office,F901-F912 and faculty office reconstructed,verified from drawing,Doors inferred
+10,10TH FLOOR (2).png,Rooms and CPE office,F1001-F1012 plus office reconstructed,inferred,Duplicate F1005 interpreted as F1006
+11,Revised 11TH FLOOR.png,Rooms and lounges,F1101-F1112 and two lounges reconstructed,verified from drawing,Study Area has no occupancy range
+12,12TH FLOOR.png,Floor-12 inventory,No occupied rooms assigned,unverified,Image contains Floor-11 and F1013 labels
+14,14TH FLOOR.png,Library,Library occupied zone reconstructed,verified from drawing,ICARE occupancy unspecified
+15,15TH FLOOR.png,Offices,F1501-F1509 reconstructed,verified from drawing,Transport core partially shown
+16,16TH FLOOR.png,Offices,F1601-F1611 reconstructed,verified from drawing,Doors inferred
+2-16,drawings,Red emergency stairs,Two normalized stair approaches connect ordered floors,inferred,Several drawings show routes rather than enclosures
+2-16,requirements,Regular elevators,Eight cars with 15-person capacity per car,requirement,Boarding and travel represented by dispatch intervals
+2-16,drawings,Green-box elevator,Confirmed stops configurable by evidence,mixed,Floor 15 treated as inferred

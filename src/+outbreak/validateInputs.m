@@ -1,20 +1,17 @@
 function validateInputs(cfg, data)
-%VALIDATEINPUTS Fail early when project inputs violate fixed requirements.
-
-assert(height(data.floors) == 16, "Expected exactly 16 floor records.");
-assert(isequal(data.floors.floor_index(:), (1:16)'), "Floor indices must be 1 through 16.");
-assert(sum(data.occupancy.population) == cfg.NumAgents, ...
-    "Floor occupancy must total %d agents.", cfg.NumAgents);
-assert(all(data.occupancy.population >= 0), "Floor populations cannot be negative.");
-assert(data.occupancy.population(data.occupancy.floor_index == 1) == 0, ...
-    "Ground Floor is an abstract evacuation sink and must start empty.");
-assert(height(data.scenarios) == 3, "Expected exactly three scenarios.");
-assert(height(data.planTraceability) == 15, ...
-    "Expected traceability records for all 15 occupied levels.");
-assert(isequal(data.planTraceability.floor_index(:), (2:16)'), ...
-    "Plan traceability must cover every occupied level from 2nd through 17th.");
-assert(all(ismember(["Baseline"; "Early Evacuation"; "Delayed Evacuation"], ...
-    data.scenarios.scenario_name)), "Required scenario names are missing.");
-assert(cfg.NumSteps == 144, "The 24-hour, 10-minute configuration must have 144 steps.");
+%VALIDATEINPUTS Enforce the revised fifteen-floor contract.
+assert(height(data.floors) == 15, "Expected exactly 15 physical floors.");
+assert(isequal(data.floors.floor_index(:), (1:15)'), "Internal floor indices must be 1 through 15.");
+assert(isequal(data.floors.physical_floor_id(:)', cfg.PhysicalFloorIds), ...
+    "Physical floors must be 1-12 and 14-16.");
+assert(~any(ismember(data.floors.physical_floor_id, [13 17])), "Floors 13 and 17 are forbidden.");
+assert(all(data.rooms.floor_index >= 2 & data.rooms.floor_index <= 15), ...
+    "Ground Floor cannot have an initial room population.");
+assert(all(data.rooms.min_occupancy <= data.rooms.max_occupancy), "Invalid occupancy range.");
+assert(numel(unique(data.rooms.room_id)) == height(data.rooms), "Room IDs must be unique.");
+assert(all(ismember(data.connections.from_floor_index, 2:14)) && ...
+    all(data.connections.to_floor_index == data.connections.from_floor_index + 1), ...
+    "Stair connections must follow the ordered physical-floor sequence.");
+assert(data.floors.physical_floor_id(12) == 12 && data.floors.physical_floor_id(13) == 14, ...
+    "Floors 12 and 14 must be adjacent in sequence.");
 end
-

@@ -1,17 +1,14 @@
-connection_id,from_floor_index,to_floor_index,connection_type,capacity_per_step,verification_status
-1,1,2,Stairs,40,Pending verification
-2,2,3,Stairs,40,Pending verification
-3,3,4,Stairs,40,Pending verification
-4,4,5,Stairs,40,Pending verification
-5,5,6,Stairs,40,Pending verification
-6,6,7,Stairs,40,Pending verification
-7,7,8,Stairs,40,Pending verification
-8,8,9,Stairs,40,Pending verification
-9,9,10,Stairs,40,Pending verification
-10,10,11,Stairs,40,Pending verification
-11,11,12,Stairs,40,Pending verification
-12,12,13,Stairs,40,Pending verification
-13,13,14,Stairs,40,Pending verification
-14,14,15,Stairs,40,Pending verification
-15,15,16,Stairs,40,Pending verification
-
+connection_id,from_floor_index,to_floor_index,from_physical_floor,to_physical_floor,connection_type,capacity_per_step,verification_status
+1,2,3,2,3,Emergency Stairs,24,Drawing-derived
+2,3,4,3,4,Emergency Stairs,24,Drawing-derived
+3,4,5,4,5,Emergency Stairs,24,Inferred landing
+4,5,6,5,6,Emergency Stairs,24,Drawing-derived
+5,6,7,6,7,Emergency Stairs,24,Drawing-derived
+6,7,8,7,8,Emergency Stairs,24,Inferred landing
+7,8,9,8,9,Emergency Stairs,24,Drawing-derived
+8,9,10,9,10,Emergency Stairs,24,Drawing-derived
+9,10,11,10,11,Emergency Stairs,24,Drawing-derived
+10,11,12,11,12,Emergency Stairs,24,Unverified on Floor 12
+11,12,13,12,14,Emergency Stairs,24,Unverified on Floor 12
+12,13,14,14,15,Emergency Stairs,24,Inferred landing on Floor 15
+13,14,15,15,16,Emergency Stairs,24,Inferred landing on Floor 15

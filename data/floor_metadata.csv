@@ -1,18 +1,16 @@
-floor_index,floor_label,main_function,reference_status,layout_source
-1,Ground Floor,Garage and evacuation discharge,Excluded,Abstract evacuation sink
-2,2nd Floor,Student Plaza and common areas,Available,FloorPlans.zip evacuation map
-3,3rd Floor,Pool support and recreation,Available,FloorPlans.zip evacuation map
-4,4th Floor,Classrooms clinic and study areas,Available,FloorPlans.zip evacuation map
-5,5th Floor,Classrooms and offices,Available,FloorPlans.zip evacuation map
-6,6th Floor,Classrooms and study areas,Available,FloorPlans.zip evacuation map
-7,7th Floor,Classrooms and engineering offices,Available,FloorPlans.zip evacuation map
-8,8th Floor,Canteen and event-level circulation,Available,FloorPlans.zip evacuation map
-9,9th Floor,Classrooms laboratories and faculty offices,Available,FloorPlans.zip evacuation map
-10,10th Floor,Classrooms and computer engineering offices,Available,FloorPlans.zip evacuation map
-11,11th Floor,Classrooms student lounges and study areas,Available,FloorPlans.zip evacuation map
-12,12th Floor,Classrooms and CSO-MIS office,Available,FloorPlans.zip evacuation map
-13,14th Floor,Library discussion room MRC and ERC,Available,FloorPlans.zip evacuation map
-14,15th Floor,Classrooms offices and service rooms,Available,FloorPlans.zip evacuation map
-15,16th Floor,Offices classrooms and audio visual rooms,Available,FloorPlans.zip evacuation map
-16,17th Floor,Gymnasium and Multipurpose Room,Available,Venue Floor Plans Compilation
-
+floor_index,physical_floor_id,floor_label,main_function,reference_status,layout_source
+1,1,Ground Floor,Parking and exit path,Provisional,No supplied drawing
+2,2,2nd Floor,Student Plaza,Verified,FLOORPLANS DRAWING.zip/2ND FLOOR.png
+3,3,3rd Floor,Gym,Verified,FLOORPLANS DRAWING.zip/3RD FLOOR.png
+4,4,4th Floor,Classrooms clinic and study areas,Verified,FLOORPLANS DRAWING.zip/4TH FLOOR.png
+5,5,5th Floor,Classrooms and offices,Verified,FLOORPLANS DRAWING.zip/5TH FLOOR.png
+6,6,6th Floor,Classrooms and study areas,Verified,FLOORPLANS DRAWING.zip/6TH FLOOR.png
+7,7,7th Floor,Classrooms and engineering offices,Partial,FLOORPLANS DRAWING.zip/7TH FLOOR.png
+8,8,8th Floor,Canteen,Conflicting,FLOORPLANS DRAWING.zip/8TH FLOOR.png
+9,9,9th Floor,Classrooms and engineering faculty,Verified,FLOORPLANS DRAWING.zip/9TH FLOOR.png
+10,10,10th Floor,Classrooms and computer engineering office,Verified,FLOORPLANS DRAWING.zip/10TH FLOOR (2).png
+11,11,11th Floor,Classrooms lounges and study area,Verified,Revised 11TH FLOOR.png
+12,12,12th Floor,Unresolved,Unverified,FLOORPLANS DRAWING.zip/12TH FLOOR.png
+13,14,14th Floor,Library,Verified,FLOORPLANS DRAWING.zip/14TH FLOOR.png
+14,15,15th Floor,Offices,Partial,FLOORPLANS DRAWING.zip/15TH FLOOR.png
+15,16,16th Floor,Offices,Verified,FLOORPLANS DRAWING.zip/16TH FLOOR.png

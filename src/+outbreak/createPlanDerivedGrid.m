@@ -1,130 +1,102 @@
-function grid = createPlanDerivedGrid(cfg, floorNumber)
-%CREATEPLANDERIVEDGRID Build a normalized schematic from supplied plans.
-% The grids preserve circulation topology and major zones, not drawing scale.
+function [grid, roomMap] = createPlanDerivedGrid(cfg, floorIndex, rooms)
+%CREATEPLANDERIVEDGRID Build a drawing-derived normalized occupancy grid.
+% Geometry preserves the relative top/bottom room bands, central transport
+% core, red stair approaches, and green-box elevator shown in the drawings.
 
 rows = cfg.GridRows;
 cols = cfg.GridColumns;
+grid = repmat(cfg.Cell.Walkable, rows, cols);
+grid([1 rows], :) = cfg.Cell.Wall;
+grid(:, [1 cols]) = cfg.Cell.Wall;
+roomMap = zeros(rows, cols, 'uint16');
 
-switch floorNumber
-    case 2 % Open student plaza with service core and broad common space.
-        grid = openPlan(cfg);
-        grid(7:17, 5:16) = cfg.Cell.Room;
-        grid(23:35, 5:16) = cfg.Cell.Room;
-        grid(10:30, 22:25) = cfg.Cell.Wall;
-        grid(18:22, 22:25) = cfg.Cell.Walkable;
-        grid(7:32, 43:55) = cfg.Cell.Special;
+if floorIndex == 1
+    grid(:) = cfg.Cell.Wall;
+    grid(20:22, 8:56) = cfg.Cell.Walkable;
+    grid(18:22, 54:56) = cfg.Cell.GreenElevator;
+    grid(20:39, 8:10) = cfg.Cell.Walkable;
+    grid(39, 8) = cfg.Cell.Exit;
+    return;
+end
 
-    case 3 % Recreation floor with a large inaccessible pool/void.
-        grid = openPlan(cfg);
-        grid(6:32, 35:54) = cfg.Cell.Wall;
-        grid(5, 34:55) = cfg.Cell.Walkable;
-        grid(33, 34:55) = cfg.Cell.Walkable;
-        grid(5:33, 33:34) = cfg.Cell.Walkable;
-        grid(7:17, 5:20) = cfg.Cell.Room;
-        grid(23:34, 5:20) = cfg.Cell.Special;
+floorRoomRows = find(rooms.floor_index == floorIndex);
+hasRightRooms = any(rooms.layout_band(floorRoomRows) == "right");
+placeBand("top", 2, 14);
+placeBand("bottom", 27, 39);
 
-    case {4, 5, 6, 7, 9, 10, 11, 12}
-        % Double-loaded academic floors: perimeter rooms, central corridor,
-        % elevator/service core, and stairs at opposite ends.
-        grid = academicPlan(cfg);
-        if floorNumber == 4
-            grid(23:34, 43:55) = cfg.Cell.Special; % clinic/study area
-        elseif floorNumber == 5
-            grid(7:17, 5:18) = cfg.Cell.Special;  % administrative office
-        elseif floorNumber == 6
-            grid(23:34, 5:18) = cfg.Cell.Special; % study area
-        elseif floorNumber == 7
-            grid(23:34, 16:27) = cfg.Cell.Special; % engineering department
-        elseif floorNumber == 9
-            grid(7:17, 44:55) = cfg.Cell.Special; % faculty/laboratory zone
-        elseif floorNumber == 10
-            grid(7:17, 44:55) = cfg.Cell.Special; % computer engineering office
-        elseif floorNumber == 11
-            grid(7:17, 5:17) = cfg.Cell.Special;
-            grid(23:34, 5:17) = cfg.Cell.Special; % student lounges
-        elseif floorNumber == 12
-            grid(7:17, 43:55) = cfg.Cell.Special; % CSO-MIS office
+areaRows = floorRoomRows(rooms.layout_band(floorRoomRows) == "area");
+for k = 1:numel(areaRows)
+    sourceRow = areaRows(k);
+    left = 4 + (k - 1) * 24;
+    right = min(left + 20, 54);
+    placeRoom(sourceRow, 3, 15, left, right, "bottom");
+end
+
+rightRows = floorRoomRows(rooms.layout_band(floorRoomRows) == "right");
+for k = 1:numel(rightRows)
+    sourceRow = rightRows(k);
+    left = 39 + (k - 1) * 10;
+    right = min(left + 9, 58);
+    placeRoom(sourceRow, 14, 26, left, right, "left");
+end
+
+% Central corridor and vertical transport drawn consistently on most plans.
+grid(19:21, 2:cols-1) = cfg.Cell.Walkable;
+grid(18:22, 27:32) = cfg.Cell.RegularElevator;
+physicalFloorId = cfg.PhysicalFloorIds(floorIndex);
+if ismember(physicalFloorId, [cfg.GreenElevatorConfirmedStops cfg.GreenElevatorInferredStops])
+    grid(18:20, 35:37) = cfg.Cell.GreenElevator;
+end
+grid(20, 2:4) = cfg.Cell.Stair;
+grid(20, cols-3:cols-1) = cfg.Cell.Stair;
+
+% The Floor-2 Student Plaza entrance is the verified external boundary.
+if floorIndex == 2
+    grid(20, cols) = cfg.Cell.Exit;
+end
+roomMap(grid ~= cfg.Cell.Room) = 0;
+
+    function placeBand(bandName, top, bottom)
+        selected = floorRoomRows(rooms.layout_band(floorRoomRows) == bandName);
+        if isempty(selected)
+            return;
         end
-
-    case 8 % Long canteen/event floor with a central concession block.
-        grid = openPlan(cfg);
-        grid(5:35, 8:12) = cfg.Cell.Room;
-        grid(5:35, 48:53) = cfg.Cell.Room;
-        grid(8:31, 25:35) = cfg.Cell.Wall;
-        grid(10:29, 27:33) = cfg.Cell.Special;
-        grid(18:22, 12:48) = cfg.Cell.Walkable;
-        grid(5:35, 43:46) = cfg.Cell.Walkable;
-
-    case 13 % Library level with open reading zones and furniture islands.
-        grid = openPlan(cfg);
-        grid(6:16, 5:18) = cfg.Cell.Room;   % ERC
-        grid(24:35, 5:18) = cfg.Cell.Room;  % MRC
-        grid(24:35, 20:33) = cfg.Cell.Room; % discussion room
-        for row = [7 13 27 33]
-            for column = [37 45 53]
-                grid(row:row+1, column:column+3) = cfg.Cell.Wall;
+        [~, order] = sort(rooms.layout_order(selected));
+        selected = selected(order);
+        if hasRightRooms
+            bandRight = 38;
+        else
+            bandRight = cols - 1;
+        end
+        edges = round(linspace(2, bandRight, numel(selected) + 1));
+        for index = 1:numel(selected)
+            left = edges(index);
+            right = edges(index + 1);
+            if bandName == "top"
+                doorSide = "bottom";
+            else
+                doorSide = "top";
             end
+            placeRoom(selected(index), top, bottom, left, right, doorSide);
         end
+    end
 
-    case 14 % Mirrored 15th-floor room-and-office arrangement.
-        grid = fliplr(academicPlan(cfg));
-        grid(7:17, 5:16) = cfg.Cell.Special;
-        grid(23:34, 44:55) = cfg.Cell.Special;
-
-    case 15 % 16th floor with offices and two auditorium/AVR zones.
-        grid = academicPlan(cfg);
-        for row = [26 29 32]
-            grid(row, 16:26) = cfg.Cell.Wall;
-            grid(row, 35:45) = cfg.Cell.Wall;
+    function placeRoom(sourceRow, top, bottom, left, right, doorSide)
+        if right - left < 4 || bottom - top < 4
+            error("Room %s is too small for the configured grid.", rooms.room_id(sourceRow));
         end
-        grid(25:34, 14:28) = cfg.Cell.Special;
-        grid(25:34, 33:47) = cfg.Cell.Special;
-
-    case 16 % 17th floor: multipurpose room and gym linked by a lobby.
-        grid = openPlan(cfg);
-        grid(5:17, 5:42) = cfg.Cell.Special;
-        grid(23:35, 12:55) = cfg.Cell.Special;
-        grid(5:17, 45:55) = cfg.Cell.Room;
-        grid(23:35, 5:9) = cfg.Cell.Room;
-        grid(18:22, 2:58) = cfg.Cell.Walkable;
-
-    otherwise
-        error("No plan-derived schematic is defined for floor index %d.", floorNumber);
-end
-
-% Normalize inter-floor connector coordinates for the simulation contract.
-grid(3:5, 3:5) = cfg.Cell.Walkable;
-grid(3, 3) = cfg.Cell.Stair;
-grid(rows-4:rows-2, cols-4:cols-2) = cfg.Cell.Walkable;
-grid(rows-2, cols-2) = cfg.Cell.Stair;
-grid(floor(rows/2), cols-5:cols-2) = cfg.Cell.Walkable;
-grid(floor(rows/2), cols-3) = cfg.Cell.Elevator;
-end
-
-function grid = openPlan(cfg)
-grid = repmat(cfg.Cell.Special, cfg.GridRows, cfg.GridColumns);
-grid([1 cfg.GridRows], :) = cfg.Cell.Wall;
-grid(:, [1 cfg.GridColumns]) = cfg.Cell.Wall;
-grid(19:21, 2:cfg.GridColumns-1) = cfg.Cell.Walkable;
-end
-
-function grid = academicPlan(cfg)
-grid = repmat(cfg.Cell.Room, cfg.GridRows, cfg.GridColumns);
-grid([1 cfg.GridRows], :) = cfg.Cell.Wall;
-grid(:, [1 cfg.GridColumns]) = cfg.Cell.Wall;
-grid(19:21, 2:cfg.GridColumns-1) = cfg.Cell.Walkable;
-
-% Room dividers include door gaps into the central corridor.
-for column = [11 20 29 39 48]
-    grid(2:17, column) = cfg.Cell.Wall;
-    grid(16:18, column) = cfg.Cell.Room;
-    grid(23:cfg.GridRows-1, column) = cfg.Cell.Wall;
-    grid(22:24, column) = cfg.Cell.Room;
-end
-
-% Central vertical-transport/service core, split by the main corridor.
-grid(12:18, 27:34) = cfg.Cell.Wall;
-grid(22:28, 27:34) = cfg.Cell.Wall;
-grid(16:18, 29:31) = cfg.Cell.Walkable;
-grid(22:24, 29:31) = cfg.Cell.Walkable;
+        grid(top:bottom, left:right) = cfg.Cell.Wall;
+        grid(top+1:bottom-1, left+1:right-1) = cfg.Cell.Room;
+        roomMap(top+1:bottom-1, left+1:right-1) = uint16(sourceRow);
+        centerRow = round((top + bottom) / 2);
+        centerCol = round((left + right) / 2);
+        switch doorSide
+            case "bottom"
+                grid(bottom, centerCol) = cfg.Cell.Door;
+            case "top"
+                grid(top, centerCol) = cfg.Cell.Door;
+            case "left"
+                grid(centerRow, left) = cfg.Cell.Door;
+        end
+    end
 end

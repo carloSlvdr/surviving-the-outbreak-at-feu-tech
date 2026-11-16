@@ -1,123 +1,147 @@
-function result = runGridScenario(cfg, data, building, scenarioRow)
-%RUNGRIDSCENARIO Execute spatial movement, infection, and evacuation.
+function result = runGridScenario(cfg, data, building, roomDraws, scenarioRow)
+%RUNGRIDSCENARIO Execute a reproducible 24-hour spatial scenario.
 
 rng(cfg.RandomSeed, "twister");
-agents = outbreak.initializeGridAgents(cfg, building, data.occupancy);
+agents = outbreak.initializeGridAgents(cfg, building, data, roomDraws);
+totalAgents = height(agents);
+numFloors = cfg.NumFloors;
 scenarioName = string(scenarioRow.scenario_name(1));
 organizedEvacuation = logical(scenarioRow.organized_evacuation(1));
 evacuationStartHour = scenarioRow.evacuation_start_hour(1);
 
-distanceToStairs = cell(16, 1);
-for floorIndex = 1:16
-    floorGrid = building.floors(floorIndex).grid;
-    distanceToStairs{floorIndex} = outbreak.computeDistanceMap( ...
-        floorGrid, floorGrid == cfg.Cell.Stair, cfg.TraversableCellCodes);
+distanceMaps = cell(numFloors, 1);
+for floorIndex = 1:numFloors
+    grid = building.floors(floorIndex).grid;
+    if floorIndex == 1 || floorIndex == 2
+        target = grid == cfg.Cell.Exit;
+    else
+        target = grid == cfg.Cell.Stair | grid == cfg.Cell.RegularElevator | ...
+            grid == cfg.Cell.GreenElevator;
+    end
+    distanceMaps{floorIndex} = outbreak.computeDistanceMap(grid, target, cfg.TraversableCellCodes);
 end
-groundGrid = building.floors(1).grid;
-distanceToExit = outbreak.computeDistanceMap( ...
-    groundGrid, groundGrid == cfg.Cell.Exit, cfg.TraversableCellCodes);
 
 timeHours = (0:cfg.NumSteps)' * cfg.TimeStepMinutes / 60;
 infected = zeros(cfg.NumSteps + 1, 1);
 nonInfected = zeros(cfg.NumSteps + 1, 1);
 escaped = zeros(cfg.NumSteps + 1, 1);
+indoor = zeros(cfg.NumSteps + 1, 1);
+occupancyVisits = zeros(cfg.GridRows, cfg.GridColumns, numFloors, 'uint32');
+infectedVisits = zeros(cfg.GridRows, cfg.GridColumns, numFloors, 'uint32');
+floorPopulation = zeros(cfg.NumSteps + 1, numFloors);
+stairQueue = zeros(cfg.NumSteps + 1, numFloors);
+regularElevatorQueue = zeros(cfg.NumSteps + 1, numFloors);
+greenElevatorQueue = zeros(cfg.NumSteps + 1, numFloors);
+stairTransfers = zeros(cfg.NumSteps, numFloors);
+regularElevatorTransfers = zeros(cfg.NumSteps, numFloors);
+greenElevatorTransfers = zeros(cfg.NumSteps, numFloors);
+
 [infected(1), nonInfected(1), escaped(1)] = countStates(agents, cfg);
-occupancyVisits = zeros(cfg.GridRows, cfg.GridColumns, 16, 'uint32');
-infectedVisits = zeros(cfg.GridRows, cfg.GridColumns, 16, 'uint32');
-floorPopulation = zeros(cfg.NumSteps + 1, 16);
-stairDemand = zeros(cfg.NumSteps + 1, 16);
-[occupancyVisits, infectedVisits, floorPopulation(1, :), stairDemand(1, :)] = ...
+indoor(1) = infected(1) + nonInfected(1);
+[occupancyVisits, infectedVisits, floorPopulation(1, :), stairQueue(1, :), ...
+    regularElevatorQueue(1, :), greenElevatorQueue(1, :)] = ...
     recordSpatialState(agents, building, cfg, occupancyVisits, infectedVisits);
 
 for step = 1:cfg.NumSteps
     currentHour = (step - 1) * cfg.TimeStepMinutes / 60;
     evacuationActive = organizedEvacuation && currentHour >= evacuationStartHour;
-    agents = moveAgents(agents, building, cfg, evacuationActive, distanceToStairs, distanceToExit);
+    [agents, stairTransfers(step, :), regularElevatorTransfers(step, :), ...
+        greenElevatorTransfers(step, :)] = moveAgents(agents, building, cfg, ...
+        evacuationActive, distanceMaps, step);
     agents = infectAdjacentAgents(agents, cfg, building);
     if evacuationActive
-        agents = processGroundExit(agents, cfg, building, data.exits);
+        agents = processAuthorizedExits(agents, cfg, building);
     end
     [infected(step + 1), nonInfected(step + 1), escaped(step + 1)] = countStates(agents, cfg);
-    [occupancyVisits, infectedVisits, floorPopulation(step + 1, :), stairDemand(step + 1, :)] = ...
+    indoor(step + 1) = infected(step + 1) + nonInfected(step + 1);
+    assert(infected(step + 1) + nonInfected(step + 1) + escaped(step + 1) == totalAgents, ...
+        "Population conservation failed at step %d.", step);
+    [occupancyVisits, infectedVisits, floorPopulation(step + 1, :), stairQueue(step + 1, :), ...
+        regularElevatorQueue(step + 1, :), greenElevatorQueue(step + 1, :)] = ...
         recordSpatialState(agents, building, cfg, occupancyVisits, infectedVisits);
-    assert(infected(step + 1) + nonInfected(step + 1) + escaped(step + 1) == cfg.NumAgents, ...
-        "Population conservation failed at grid step %d.", step);
 end
 
 result.scenarioName = scenarioName;
-result.timeSeries = table(timeHours, infected, nonInfected, escaped, ...
-    'VariableNames', {'time_hours', 'infected', 'non_infected', 'escaped'});
+result.generatedInitialTotal = totalAgents;
+result.roomDraws = roomDraws;
+result.timeSeries = table(timeHours, infected, nonInfected, escaped, indoor, ...
+    'VariableNames', {'time_hours', 'infected', 'non_infected', 'escaped', 'indoor_population'});
 result.finalAgents = agents;
 result.spatial.occupancyVisits = occupancyVisits;
 result.spatial.infectedVisits = infectedVisits;
 result.spatial.floorPopulation = floorPopulation;
-result.spatial.stairDemand = stairDemand;
+result.spatial.stairQueue = stairQueue;
+result.spatial.regularElevatorQueue = regularElevatorQueue;
+result.spatial.greenElevatorQueue = greenElevatorQueue;
+result.spatial.stairTransfers = stairTransfers;
+result.spatial.regularElevatorTransfers = regularElevatorTransfers;
+result.spatial.greenElevatorTransfers = greenElevatorTransfers;
 result.spatial.floorLabels = string({building.floors.floorLabel});
-result.summary = table(scenarioName, infected(end), nonInfected(end), escaped(end), ...
-    100 * escaped(end) / cfg.NumAgents, ...
-    'VariableNames', {'scenario', 'infected', 'non_infected', 'escaped', 'escape_rate_percent'});
+result.summary = table(scenarioName, totalAgents, infected(end), nonInfected(end), escaped(end), ...
+    100 * escaped(end) / totalAgents, ...
+    'VariableNames', {'scenario', 'initial_total', 'infected', 'non_infected', 'escaped', 'escape_rate_percent'});
 end
 
-function [occupancyVisits, infectedVisits, floorPopulation, stairDemand] = ...
-        recordSpatialState(agents, building, cfg, occupancyVisits, infectedVisits)
-floorPopulation = zeros(1, 16);
-stairDemand = zeros(1, 16);
+function [agents, stairCounts, regularCounts, greenCounts] = ...
+        moveAgents(agents, building, cfg, evacuationActive, distanceMaps, step)
+numFloors = cfg.NumFloors;
+occupied = false(cfg.GridRows, cfg.GridColumns, numFloors);
 activeRows = find(agents.status ~= cfg.Status.Escaped);
 for agentIndex = activeRows'
-    floorIndex = double(agents.floor_index(agentIndex));
-    row = double(agents.grid_row(agentIndex));
-    column = double(agents.grid_column(agentIndex));
-    occupancyVisits(row, column, floorIndex) = occupancyVisits(row, column, floorIndex) + 1;
-    floorPopulation(floorIndex) = floorPopulation(floorIndex) + 1;
-    if agents.status(agentIndex) == cfg.Status.Infected
-        infectedVisits(row, column, floorIndex) = infectedVisits(row, column, floorIndex) + 1;
-    end
-    if building.floors(floorIndex).grid(row, column) == cfg.Cell.Stair
-        stairDemand(floorIndex) = stairDemand(floorIndex) + 1;
-    end
+    occupied(agents.grid_row(agentIndex), agents.grid_column(agentIndex), agents.floor_index(agentIndex)) = true;
 end
-end
-
-function agents = moveAgents(agents, building, cfg, evacuationActive, distanceToStairs, distanceToExit)
-occupied = false(cfg.GridRows, cfg.GridColumns, 16);
-activeRows = find(agents.status ~= cfg.Status.Escaped);
-for rowIndex = activeRows'
-    occupied(agents.grid_row(rowIndex), agents.grid_column(rowIndex), agents.floor_index(rowIndex)) = true;
-end
-
+stairCounts = zeros(1, numFloors);
+regularCounts = zeros(1, numFloors);
+greenCounts = zeros(1, numFloors);
+greenTotal = 0;
 moveOrder = activeRows(randperm(numel(activeRows)));
 directions = int16([-1 0; 1 0; 0 -1; 0 1]);
+
 for agentIndex = moveOrder'
     floorIndex = double(agents.floor_index(agentIndex));
     row = double(agents.grid_row(agentIndex));
     column = double(agents.grid_column(agentIndex));
-    currentGrid = building.floors(floorIndex).grid;
+    grid = building.floors(floorIndex).grid;
+    cellCode = grid(row, column);
 
-    isEvacuating = evacuationActive && agents.status(agentIndex) == cfg.Status.NonInfected;
-    if isEvacuating && rand < cfg.EvacuationMovementProbability
-        if floorIndex > 1 && currentGrid(row, column) == cfg.Cell.Stair
-            if ismember(building.floors(floorIndex - 1).grid(row, column), cfg.TraversableCellCodes) ...
-                    && ~occupied(row, column, floorIndex - 1)
+    if evacuationActive
+        if floorIndex > 2 && cellCode == cfg.Cell.Stair && stairCounts(floorIndex) < cfg.StairCapacityPerStep
+            [agents, occupied, moved] = transferSameCell(agents, occupied, agentIndex, floorIndex - 1, row, column, building, cfg);
+            if moved, stairCounts(floorIndex) = stairCounts(floorIndex) + 1; end
+            continue;
+        elseif floorIndex > 2 && cellCode == cfg.Cell.RegularElevator ...
+                && mod(step, cfg.RegularElevatorDispatchIntervalSteps) == 0 ...
+                && regularCounts(floorIndex) < cfg.RegularElevatorCars * cfg.RegularElevatorCapacityPerCar
+            [agents, occupied, moved] = transferSameCell(agents, occupied, agentIndex, floorIndex - 1, row, column, building, cfg);
+            if moved, regularCounts(floorIndex) = regularCounts(floorIndex) + 1; end
+            continue;
+        elseif floorIndex > 1 && cellCode == cfg.Cell.GreenElevator ...
+                && mod(step, cfg.GreenElevatorDispatchIntervalSteps) == 0 ...
+                && greenTotal < cfg.GreenElevatorCars * cfg.GreenElevatorCapacityPerCar
+            [targetRow, targetColumn] = firstFreeCell(building.floors(1).grid == cfg.Cell.GreenElevator, occupied(:, :, 1));
+            if targetRow > 0
                 occupied(row, column, floorIndex) = false;
-                agents.floor_index(agentIndex) = uint8(floorIndex - 1);
-                occupied(row, column, floorIndex - 1) = true;
+                agents.floor_index(agentIndex) = uint8(1);
+                agents.grid_row(agentIndex) = uint16(targetRow);
+                agents.grid_column(agentIndex) = uint16(targetColumn);
+                occupied(targetRow, targetColumn, 1) = true;
+                greenCounts(floorIndex) = greenCounts(floorIndex) + 1;
+                greenTotal = greenTotal + 1;
             end
-            continue
+            continue;
         end
-        if floorIndex == 1
-            distanceMap = distanceToExit;
-        else
-            distanceMap = distanceToStairs{floorIndex};
-        end
-        [newRow, newColumn] = bestNeighbor(row, column, currentGrid, occupied(:, :, floorIndex), ...
-            distanceMap, cfg.TraversableCellCodes, directions, true);
-    elseif rand < cfg.NormalMovementProbability
-        [newRow, newColumn] = bestNeighbor(row, column, currentGrid, occupied(:, :, floorIndex), ...
-            [], cfg.TraversableCellCodes, directions, false);
-    else
-        continue
     end
 
+    if evacuationActive && rand < cfg.EvacuationMovementProbability
+        distanceMap = distanceMaps{floorIndex};
+        [newRow, newColumn] = bestNeighbor(row, column, grid, occupied(:, :, floorIndex), ...
+            distanceMap, cfg.TraversableCellCodes, directions, true);
+    elseif rand < cfg.NormalMovementProbability
+        [newRow, newColumn] = bestNeighbor(row, column, grid, occupied(:, :, floorIndex), ...
+            [], cfg.TraversableCellCodes, directions, false);
+    else
+        continue;
+    end
     if newRow ~= row || newColumn ~= column
         occupied(row, column, floorIndex) = false;
         agents.grid_row(agentIndex) = uint16(newRow);
@@ -127,89 +151,106 @@ for agentIndex = moveOrder'
 end
 end
 
-function [newRow, newColumn] = bestNeighbor(row, column, grid, occupied, distanceMap, traversableCodes, directions, guided)
-candidates = zeros(4, 2);
-candidateCount = 0;
-for directionIndex = 1:4
-    neighbor = int16([row column]) + directions(directionIndex, :);
-    candidateRow = double(neighbor(1));
-    candidateColumn = double(neighbor(2));
-    if candidateRow >= 1 && candidateRow <= size(grid, 1) && candidateColumn >= 1 && candidateColumn <= size(grid, 2) ...
-            && ismember(grid(candidateRow, candidateColumn), traversableCodes) ...
-            && ~occupied(candidateRow, candidateColumn)
-        candidateCount = candidateCount + 1;
-        candidates(candidateCount, :) = [candidateRow candidateColumn];
-    end
+function [agents, occupied, moved] = transferSameCell(agents, occupied, agentIndex, targetFloor, row, column, building, cfg)
+moved = false;
+if ismember(building.floors(targetFloor).grid(row, column), cfg.TraversableCellCodes) ...
+        && ~occupied(row, column, targetFloor)
+    sourceFloor = double(agents.floor_index(agentIndex));
+    occupied(row, column, sourceFloor) = false;
+    agents.floor_index(agentIndex) = uint8(targetFloor);
+    occupied(row, column, targetFloor) = true;
+    moved = true;
+end
 end
 
-newRow = row;
-newColumn = column;
-if candidateCount == 0
-    return
+function [row, column] = firstFreeCell(mask, occupied)
+index = find(mask & ~occupied, 1, 'first');
+if isempty(index), row = 0; column = 0; else, [row, column] = ind2sub(size(mask), index); end
 end
-candidates = candidates(1:candidateCount, :);
+
+function [newRow, newColumn] = bestNeighbor(row, column, grid, occupied, distanceMap, traversableCodes, directions, guided)
+candidates = zeros(4, 2); count = 0;
+for directionIndex = 1:4
+    neighbor = int16([row column]) + directions(directionIndex, :);
+    r = double(neighbor(1)); c = double(neighbor(2));
+    if r >= 1 && r <= size(grid, 1) && c >= 1 && c <= size(grid, 2) ...
+            && ismember(grid(r, c), traversableCodes) && ~occupied(r, c)
+        count = count + 1; candidates(count, :) = [r c];
+    end
+end
+newRow = row; newColumn = column;
+if count == 0, return; end
+candidates = candidates(1:count, :);
 if guided
-    indices = sub2ind(size(distanceMap), candidates(:, 1), candidates(:, 2));
-    candidateDistances = distanceMap(indices);
-    bestDistance = min(candidateDistances);
-    bestRows = find(candidateDistances == bestDistance);
-    selected = bestRows(randi(numel(bestRows)));
+    values = distanceMap(sub2ind(size(distanceMap), candidates(:, 1), candidates(:, 2)));
+    best = find(values == min(values)); selected = best(randi(numel(best)));
 else
-    selected = randi(candidateCount);
+    selected = randi(count);
 end
-newRow = candidates(selected, 1);
-newColumn = candidates(selected, 2);
+newRow = candidates(selected, 1); newColumn = candidates(selected, 2);
 end
 
 function agents = infectAdjacentAgents(agents, cfg, building)
-infectedMaps = false(cfg.GridRows, cfg.GridColumns, 16);
+infectedMaps = false(cfg.GridRows, cfg.GridColumns, cfg.NumFloors);
 infectedRows = find(agents.status == cfg.Status.Infected);
 for agentIndex = infectedRows'
     infectedMaps(agents.grid_row(agentIndex), agents.grid_column(agentIndex), agents.floor_index(agentIndex)) = true;
 end
-
 susceptibleRows = find(agents.status == cfg.Status.NonInfected);
 newlyInfected = false(height(agents), 1);
 directions = int16([-1 0; 1 0; 0 -1; 0 1]);
 for agentIndex = susceptibleRows'
-    floorIndex = double(agents.floor_index(agentIndex));
-    row = double(agents.grid_row(agentIndex));
-    column = double(agents.grid_column(agentIndex));
-    adjacentInfected = 0;
+    floorIndex = double(agents.floor_index(agentIndex)); row = double(agents.grid_row(agentIndex)); column = double(agents.grid_column(agentIndex));
+    adjacent = 0;
     for directionIndex = 1:4
         neighbor = int16([row column]) + directions(directionIndex, :);
-        if neighbor(1) >= 1 && neighbor(1) <= size(building.floors(floorIndex).grid, 1) ...
-                && neighbor(2) >= 1 && neighbor(2) <= size(building.floors(floorIndex).grid, 2)
-            adjacentInfected = adjacentInfected + infectedMaps(neighbor(1), neighbor(2), floorIndex);
+        if neighbor(1) >= 1 && neighbor(1) <= cfg.GridRows && neighbor(2) >= 1 && neighbor(2) <= cfg.GridColumns
+            adjacent = adjacent + infectedMaps(neighbor(1), neighbor(2), floorIndex);
         end
     end
-    probability = min(cfg.MaximumInfectionProbability, ...
-        1 - (1 - cfg.InfectionRate) ^ adjacentInfected);
-    newlyInfected(agentIndex) = adjacentInfected > 0 && rand < probability;
+    probability = min(cfg.MaximumInfectionProbability, 1 - (1 - cfg.InfectionRate) ^ adjacent);
+    newlyInfected(agentIndex) = adjacent > 0 && rand < probability;
 end
 agents.status(newlyInfected) = cfg.Status.Infected;
+agents.infection_history(newlyInfected) = true;
 end
 
-function agents = processGroundExit(agents, cfg, building, exits)
-exitMask = building.floors(1).grid == cfg.Cell.Exit;
-[exitRows, exitColumns] = find(exitMask);
-groundSusceptible = find(agents.floor_index == 1 & agents.status == cfg.Status.NonInfected);
-eligible = false(numel(groundSusceptible), 1);
-for index = 1:numel(groundSusceptible)
-    agentIndex = groundSusceptible(index);
-    distance = abs(double(agents.grid_row(agentIndex)) - exitRows) ...
-        + abs(double(agents.grid_column(agentIndex)) - exitColumns);
-    eligible(index) = any(distance <= 1);
+function agents = processAuthorizedExits(agents, cfg, building)
+for floorIndex = [1 2]
+    exitMask = building.floors(floorIndex).grid == cfg.Cell.Exit;
+    [exitRows, exitColumns] = find(exitMask);
+    candidates = find(agents.floor_index == floorIndex & agents.status ~= cfg.Status.Escaped);
+    eligible = false(numel(candidates), 1);
+    for k = 1:numel(candidates)
+        index = candidates(k);
+        distance = abs(double(agents.grid_row(index)) - exitRows) + abs(double(agents.grid_column(index)) - exitColumns);
+        eligible(k) = any(distance <= 1);
+    end
+    candidates = candidates(eligible);
+    if floorIndex == 1, capacity = cfg.GroundExitCapacityPerStep; else, capacity = cfg.Floor2ExitCapacityPerStep; end
+    if numel(candidates) > capacity, candidates = candidates(randperm(numel(candidates), capacity)); end
+    agents.status(candidates) = cfg.Status.Escaped;
+    agents.floor_index(candidates) = uint8(0);
+    agents.grid_row(candidates) = uint16(0);
+    agents.grid_column(candidates) = uint16(0);
 end
-candidates = groundSusceptible(eligible);
-capacity = exits.capacity_per_step(1);
-if numel(candidates) > capacity
-    candidates = candidates(randperm(numel(candidates), capacity));
 end
-agents.status(candidates) = cfg.Status.Escaped;
-agents.floor_index(candidates) = uint8(0);
-agents.grid_row(candidates) = uint16(0);
-agents.grid_column(candidates) = uint16(0);
+
+function [occupancyVisits, infectedVisits, floorPopulation, stairQueue, regularQueue, greenQueue] = ...
+        recordSpatialState(agents, building, cfg, occupancyVisits, infectedVisits)
+floorPopulation = zeros(1, cfg.NumFloors); stairQueue = zeros(1, cfg.NumFloors);
+regularQueue = zeros(1, cfg.NumFloors); greenQueue = zeros(1, cfg.NumFloors);
+activeRows = find(agents.status ~= cfg.Status.Escaped);
+for agentIndex = activeRows'
+    floorIndex = double(agents.floor_index(agentIndex)); row = double(agents.grid_row(agentIndex)); column = double(agents.grid_column(agentIndex));
+    occupancyVisits(row, column, floorIndex) = occupancyVisits(row, column, floorIndex) + 1;
+    floorPopulation(floorIndex) = floorPopulation(floorIndex) + 1;
+    if agents.status(agentIndex) == cfg.Status.Infected, infectedVisits(row, column, floorIndex) = infectedVisits(row, column, floorIndex) + 1; end
+    code = building.floors(floorIndex).grid(row, column);
+    if code == cfg.Cell.Stair, stairQueue(floorIndex) = stairQueue(floorIndex) + 1; end
+    if code == cfg.Cell.RegularElevator, regularQueue(floorIndex) = regularQueue(floorIndex) + 1; end
+    if code == cfg.Cell.GreenElevator, greenQueue(floorIndex) = greenQueue(floorIndex) + 1; end
+end
 end
 
 function [infected, nonInfected, escaped] = countStates(agents, cfg)
@@ -217,4 +258,3 @@ infected = sum(agents.status == cfg.Status.Infected);
 nonInfected = sum(agents.status == cfg.Status.NonInfected);
 escaped = sum(agents.status == cfg.Status.Escaped);
 end
-

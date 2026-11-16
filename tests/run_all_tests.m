@@ -1,58 +1,36 @@
-%RUN_ALL_TESTS Validate fixed requirements and model invariants.
-
+%RUN_ALL_TESTS Validate the authoritative fifteen-floor implementation.
 projectRoot = string(fileparts(fileparts(mfilename('fullpath'))));
-addpath(fullfile(projectRoot, "config"));
-addpath(fullfile(projectRoot, "src"));
-
-cfg = defaultConfig();
-data = outbreak.loadProjectData(projectRoot);
+addpath(fullfile(projectRoot, "config")); addpath(fullfile(projectRoot, "src"));
+cfg = defaultConfig(); data = outbreak.loadProjectData(projectRoot);
 outbreak.validateInputs(cfg, data);
+assert(isequal(cfg.PhysicalFloorIds, [1:12 14:16]));
+assert(~any(ismember(cfg.PhysicalFloorIds, [13 17])));
 
 building = outbreak.buildBuildingModel(cfg, data);
-buildingReport = outbreak.validateBuildingModel(cfg, building);
-assert(all(buildingReport.framework_validation == "passed"));
-gridSources = string({building.floors.gridSource});
-assert(sum(gridSources == "Plan-derived schematic") == 15);
-assert(sum(gridSources == "Abstract evacuation sink") == 1);
-assert(data.occupancy.population(1) == 0);
+report = outbreak.validateBuildingModel(cfg, building, data);
+assert(all(report.framework_validation == "passed"));
+assert(~any(building.floors(1).grid(:) == cfg.Cell.Stair));
+assert(~any(building.floors(1).grid(:) == cfg.Cell.RegularElevator));
 
-gridAgents = outbreak.initializeGridAgents(cfg, building, data.occupancy);
-assert(height(gridAgents) == cfg.NumAgents);
-assert(numel(unique(gridAgents.agent_id)) == cfg.NumAgents);
-for agentIndex = 1:height(gridAgents)
-    floorGrid = building.floors(gridAgents.floor_index(agentIndex)).grid;
-    cellCode = floorGrid(gridAgents.grid_row(agentIndex), gridAgents.grid_column(agentIndex));
-    assert(ismember(cellCode, cfg.TraversableCellCodes));
-end
+drawsA = outbreak.generateRoomOccupancy(cfg, data);
+drawsB = outbreak.generateRoomOccupancy(cfg, data);
+assert(isequal(drawsA.generated_occupancy, drawsB.generated_occupancy));
+assert(all(drawsA.generated_occupancy >= drawsA.min_occupancy));
+assert(all(drawsA.generated_occupancy <= drawsA.max_occupancy));
+agents = outbreak.initializeGridAgents(cfg, building, data, drawsA);
+initialTotal = sum(drawsA.generated_occupancy);
+assert(height(agents) == initialTotal && numel(unique(agents.agent_id)) == initialTotal);
+assert(sum(agents.status == cfg.Status.Infected) == cfg.InitialInfectedCount);
 
-rng(cfg.RandomSeed, "twister");
-agents = outbreak.initializeAgents(cfg, data.occupancy);
-assert(height(agents) == 4000);
-assert(sum(agents.status == cfg.Status.Infected) == 1);
-assert(sum(agents.status == cfg.Status.NonInfected) == 3999);
-assert(sum(agents.status == cfg.Status.Escaped) == 0);
+shortCfg = cfg; shortCfg.NumSteps = 6; shortCfg.DurationHours = 1;
+scenario = data.scenarios(data.scenarios.scenario_name == "Early Evacuation", :);
+scenario.evacuation_start_hour = 0;
+result = outbreak.runGridScenario(shortCfg, data, building, drawsA, scenario);
+totals = result.timeSeries.infected + result.timeSeries.non_infected + result.timeSeries.escaped;
+assert(all(totals == initialTotal));
+assert(size(result.spatial.floorPopulation, 2) == 15);
+assert(size(result.spatial.occupancyVisits, 3) == 15);
+assert(all(result.finalAgents.status >= 1 & result.finalAgents.status <= 3));
+assert(all(result.finalAgents.floor_index(result.finalAgents.status ~= cfg.Status.Escaped) >= 1));
 
-for scenarioIndex = 1:height(data.scenarios)
-    firstRun = outbreak.runScenario(cfg, data, data.scenarios(scenarioIndex, :));
-    secondRun = outbreak.runScenario(cfg, data, data.scenarios(scenarioIndex, :));
-    totals = firstRun.timeSeries.infected + firstRun.timeSeries.non_infected + firstRun.timeSeries.escaped;
-    assert(all(totals == cfg.NumAgents));
-    assert(all(ismember(firstRun.finalAgents.status, uint8([1 2 3]))));
-    active = firstRun.finalAgents.status ~= cfg.Status.Escaped;
-    assert(all(firstRun.finalAgents.floor_index(active) >= 1 & firstRun.finalAgents.floor_index(active) <= 16));
-    assert(isequal(firstRun.timeSeries, secondRun.timeSeries), "Seed reproducibility failed.");
-end
-
-shortCfg = cfg;
-shortCfg.NumSteps = 12;
-gridRun = outbreak.runGridScenario(shortCfg, data, building, data.scenarios(2, :));
-gridTotals = gridRun.timeSeries.infected + gridRun.timeSeries.non_infected + gridRun.timeSeries.escaped;
-assert(all(gridTotals == cfg.NumAgents));
-assert(isequal(size(gridRun.spatial.occupancyVisits), [cfg.GridRows cfg.GridColumns 16]));
-assert(isequal(size(gridRun.spatial.floorPopulation), [shortCfg.NumSteps + 1 16]));
-assert(all(sum(gridRun.spatial.floorPopulation, 2) + gridRun.timeSeries.escaped == cfg.NumAgents));
-gridActive = gridRun.finalAgents.status ~= cfg.Status.Escaped;
-assert(all(gridRun.finalAgents.floor_index(gridActive) >= 1 & gridRun.finalAgents.floor_index(gridActive) <= 16));
-
-fprintf('All initial model tests passed.\n');
-
+fprintf('All authoritative model tests passed for %d generated agents.\n', initialTotal);

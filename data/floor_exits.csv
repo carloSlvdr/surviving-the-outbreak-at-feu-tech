@@ -1,3 +1,3 @@
-exit_id,floor_index,exit_label,capacity_per_step,verification_status
-1,1,Primary Ground Exit,60,Pending verification
-
+exit_id,floor_index,physical_floor_id,exit_label,capacity_per_step,verification_status
+1,2,2,Student Plaza Entrance Boundary,40,Verified from drawing
+2,1,1,Ground Floor Exit Boundary,30,Provisional - no drawing supplied
