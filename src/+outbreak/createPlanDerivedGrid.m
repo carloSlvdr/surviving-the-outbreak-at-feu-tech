@@ -13,7 +13,7 @@ roomMap = zeros(rows, cols, 'uint16');
 if floorIndex == 1
     grid(:) = cfg.Cell.Wall;
     grid(20:22, 8:56) = cfg.Cell.Walkable;
-    grid(18:22, 54:56) = cfg.Cell.GreenElevator;
+    grid(16:20, 52:55) = cfg.Cell.GreenElevator;
     grid(20:39, 8:10) = cfg.Cell.Walkable;
     grid(39, 8) = cfg.Cell.Exit;
     return;
@@ -56,12 +56,20 @@ for k = 1:numel(rightRows)
     placeRoom(sourceRow, 14, 26, left, right, "left");
 end
 
-% Central corridor and vertical transport drawn consistently on most plans.
+% Central corridor and eight regular elevator shafts drawn consistently on
+% every upper floor: a 3-by-2 bank plus a separate 1-by-2 bank.
 grid(19:21, 2:cols-1) = cfg.Cell.Walkable;
-grid(18:22, 27:32) = cfg.Cell.RegularElevator;
-if ismember(physicalFloorId, [cfg.GreenElevatorConfirmedStops cfg.GreenElevatorInferredStops])
-    grid(18:20, 35:37) = cfg.Cell.GreenElevator;
+regularColumns = {[13 16], [18 21], [23 26], [29 32]};
+regularRows = {[14 19], [22 27]};
+for columnIndex = 1:numel(regularColumns)
+    for rowIndex = 1:numel(regularRows)
+        grid(regularRows{rowIndex}(1):regularRows{rowIndex}(2), ...
+            regularColumns{columnIndex}(1):regularColumns{columnIndex}(2)) = ...
+            cfg.Cell.RegularElevator;
+    end
 end
+% Green elevator: adjacent to the right-side stair and aligned on all floors.
+grid(16:20, 52:55) = cfg.Cell.GreenElevator;
 grid(20, 2:4) = cfg.Cell.Stair;
 grid(20, cols-3:cols-1) = cfg.Cell.Stair;
 

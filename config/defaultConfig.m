@@ -54,7 +54,8 @@ cfg.GreenElevatorDispatchIntervalSteps = 3;
 cfg.Floor2ExitCapacityPerStep = 40;
 cfg.GroundExitCapacityPerStep = 30;
 
-% Green-box stops visible in the current drawings. Floor 15 is inferred.
-cfg.GreenElevatorConfirmedStops = [2 3 5 6 8 9 10 11 14 16];
-cfg.GreenElevatorInferredStops = 15;
+% Latest user-confirmed service: the green elevator is present beside the
+% right stair on every modeled upper floor.
+cfg.GreenElevatorConfirmedStops = cfg.PhysicalFloorIds(2:end);
+cfg.GreenElevatorInferredStops = [];
 end

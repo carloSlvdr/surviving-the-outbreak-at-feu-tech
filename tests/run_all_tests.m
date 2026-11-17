@@ -23,6 +23,10 @@ floor2 = building.floors(2); floor8 = building.floors(8); floor14 = building.flo
 assert(nnz(floor2.roomMap) > 1500 && nnz(floor8.roomMap) > 1500);
 assert(nnz(floor14.roomMap) > 900);
 assert(nnz(floor2.grid == cfg.Cell.Exit) == 18);
+for floorIndex = 2:cfg.NumFloors
+    assert(nnz(building.floors(floorIndex).grid == cfg.Cell.RegularElevator) == 192);
+    assert(nnz(building.floors(floorIndex).grid == cfg.Cell.GreenElevator) == 20);
+end
 assert(~any(building.floors(1).grid(:) == cfg.Cell.Stair));
 assert(~any(building.floors(1).grid(:) == cfg.Cell.RegularElevator));
 
