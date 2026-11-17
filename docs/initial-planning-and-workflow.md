@@ -1,7 +1,7 @@
 # Development workflow
 
 1. Maintain the floor and feature evidence table.
-2. Correct unresolved Floor-1, Floor-8, and Floor-12 geometry when verified drawings become available.
+2. Correct unresolved Floor-1 and Floor-8 geometry when verified drawings become available; replace the user-directed Floor-12 derivation if an independently verified Floor-12 plan is supplied.
 3. Validate every occupied room's path to an authorized exit.
 4. Generate room occupancy from a recorded seed.
 5. Run automated conservation, connector, and reachability tests.

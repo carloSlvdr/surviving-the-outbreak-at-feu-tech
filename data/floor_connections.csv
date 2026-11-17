@@ -8,7 +8,7 @@ connection_id,from_floor_index,to_floor_index,from_physical_floor,to_physical_fl
 7,8,9,8,9,Emergency Stairs,24,Drawing-derived
 8,9,10,9,10,Emergency Stairs,24,Drawing-derived
 9,10,11,10,11,Emergency Stairs,24,Drawing-derived
-10,11,12,11,12,Emergency Stairs,24,Unverified on Floor 12
-11,12,13,12,14,Emergency Stairs,24,Unverified on Floor 12
+10,11,12,11,12,Emergency Stairs,24,Derived from Floor 11 template on Floor 12
+11,12,13,12,14,Emergency Stairs,24,Derived from Floor 11 template on Floor 12
 12,13,14,14,15,Emergency Stairs,24,Inferred landing on Floor 15
 13,14,15,15,16,Emergency Stairs,24,Inferred landing on Floor 15

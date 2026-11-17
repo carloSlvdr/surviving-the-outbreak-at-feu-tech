@@ -10,7 +10,7 @@ floor_index,physical_floor_id,floor_label,main_function,reference_status,layout_
 9,9,9th Floor,Classrooms and engineering faculty,Verified,FLOORPLANS DRAWING.zip/9TH FLOOR.png
 10,10,10th Floor,Classrooms and computer engineering office,Verified,FLOORPLANS DRAWING.zip/10TH FLOOR (2).png
 11,11,11th Floor,Classrooms lounges and study area,Verified,Revised 11TH FLOOR.png
-12,12,12th Floor,Unresolved,Unverified,FLOORPLANS DRAWING.zip/12TH FLOOR.png
+12,12,12th Floor,Classrooms lounges and study area,Derived,Revised 11TH FLOOR.png template per user direction
 13,14,14th Floor,Library,Verified,FLOORPLANS DRAWING.zip/14TH FLOOR.png
 14,15,15th Floor,Offices,Partial,FLOORPLANS DRAWING.zip/15TH FLOOR.png
 15,16,16th Floor,Offices,Verified,FLOORPLANS DRAWING.zip/16TH FLOOR.png

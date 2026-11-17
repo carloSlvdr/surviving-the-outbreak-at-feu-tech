@@ -8,6 +8,8 @@ Agents move through four-neighbor traversable grid cells. Walls are impassable. 
 
 Large-area floors use plan-specific occupied regions rather than the generic classroom-room template. Floor 2 distributes Student Plaza occupants across the open floor plate and exposes a visible lower-right entrance boundary. Floor 8 distributes Canteen occupants across the full usable floor. Floor 14 distributes Library occupants across the upper full-width and lower-right library regions shown in its drawing.
 
+Floor 12 is a user-directed derivation of the revised Floor 11 plan because the supplied Floor 12 source image is mislabeled. It reproduces the Floor 11 geometry and transport core while using distinct F1201-F1212 identifiers and two Floor 12 lounge identifiers. Its geometry is derived rather than independently verified.
+
 Regular elevators and emergency stairs connect only the upper-floor sequence. They cannot reach Floor 1. Each upper-floor grid contains eight distinct, vertically aligned regular elevator shafts: six in the left bank and two in the middle bank. Room bands are inset from the transport core so doors open into dedicated hallway margins rather than elevator cells. A separate right-side circulation bay keeps rooms clear of the green-box elevator and adjacent stair. The green elevator serves every modeled upper floor and is the only modeled elevator connection to Floor 1. Elevator capacity is 15 per car; eight regular cars and one green car are configured. Dispatch intervals are provisional operational abstractions.
 
 Both Non-Infected and Infected agents may become Escaped after crossing the Floor-2 entrance or Floor-1 exit. Escaped is terminal.

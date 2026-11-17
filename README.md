@@ -15,7 +15,7 @@ MATLAB agent-based infection and evacuation simulation using the authoritative h
 - aggressive infected movement and pursuit with a 12% adjacency-based bite probability
 - guaranteed infection after a successful bite, capped at 35% bite probability per update
 
-Floors 13 and 17 are not part of the model. Floor 12 has no initial room population because its supplied drawing is mislabeled. Floor 1 is provisional because no drawing was supplied.
+Floors 13 and 17 are not part of the model. Floor 12 is explicitly derived from the revised Floor 11 plan by user direction and has distinct F1201-F1212 rooms plus two lounges. Floor 1 is provisional because no drawing was supplied.
 
 ## Run
 

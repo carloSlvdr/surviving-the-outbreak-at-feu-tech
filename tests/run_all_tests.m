@@ -22,6 +22,8 @@ assert(all(report.framework_validation == "passed"));
 floor2 = building.floors(2); floor8 = building.floors(8); floor14 = building.floors(13);
 assert(nnz(floor2.roomMap) > 1500 && nnz(floor8.roomMap) > 1500);
 assert(nnz(floor14.roomMap) > 900);
+assert(isequal(building.floors(11).grid, building.floors(12).grid));
+assert(sum(data.rooms.physical_floor_id == 12) == 14);
 assert(nnz(floor2.grid == cfg.Cell.Exit) == 18);
 for floorIndex = 2:cfg.NumFloors
     floorGrid = building.floors(floorIndex).grid;

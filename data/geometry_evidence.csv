@@ -13,10 +13,10 @@ physical_floor_id,source_image,feature,interpretation,confidence,uncertainty
 9,9TH FLOOR.png,Rooms and faculty office,F901-F912 and faculty office reconstructed,verified from drawing,Doors inferred
 10,10TH FLOOR (2).png,Rooms and CPE office,F1001-F1012 plus office reconstructed,inferred,Duplicate F1005 interpreted as F1006
 11,Revised 11TH FLOOR.png,Rooms and lounges,F1101-F1112 and two lounges reconstructed,verified from drawing,Study Area has no occupancy range
-12,12TH FLOOR.png,Floor-12 inventory,No occupied rooms assigned,unverified,Image contains Floor-11 and F1013 labels
+12,Revised 11TH FLOOR.png template,Derived rooms and lounges,F1201-F1212 and two Floor-12 lounges reconstructed,user-directed derivation,Not an independently verified Floor-12 drawing
 14,14TH FLOOR.png,Library,Library occupied zone reconstructed,verified from drawing,ICARE occupancy unspecified
 15,15TH FLOOR.png,Offices,F1501-F1509 reconstructed,verified from drawing,Transport core partially shown
 16,16TH FLOOR.png,Offices,F1601-F1611 reconstructed,verified from drawing,Doors inferred
 2-16,drawings,Red emergency stairs,Two normalized stair approaches connect ordered floors,inferred,Several drawings show routes rather than enclosures
 2-16,requirements,Regular elevators,Eight cars with 15-person capacity per car,requirement,Boarding and travel represented by dispatch intervals
-2-16,drawings,Green-box elevator,Confirmed stops configurable by evidence,mixed,Floor 15 treated as inferred
+2-16,user-confirmed geometry,Green-box elevator,Serves every modeled upper floor beside the right stair,user-confirmed,Not independently measured
