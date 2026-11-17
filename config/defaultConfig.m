@@ -6,6 +6,7 @@ cfg.DurationHours = 24;
 cfg.TimeStepMinutes = 10;
 cfg.NumSteps = cfg.DurationHours * 60 / cfg.TimeStepMinutes;
 cfg.RandomSeed = 20261116;
+cfg.RecordAgentHistory = false;
 cfg.PhysicalFloorIds = [1:12 14:16];
 cfg.NumFloors = numel(cfg.PhysicalFloorIds);
 

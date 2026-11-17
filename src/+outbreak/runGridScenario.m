@@ -36,6 +36,17 @@ greenElevatorQueue = zeros(cfg.NumSteps + 1, numFloors);
 stairTransfers = zeros(cfg.NumSteps, numFloors);
 regularElevatorTransfers = zeros(cfg.NumSteps, numFloors);
 greenElevatorTransfers = zeros(cfg.NumSteps, numFloors);
+recordAgentHistory = isfield(cfg, 'RecordAgentHistory') && cfg.RecordAgentHistory;
+if recordAgentHistory
+    agentHistory.floorIndex = zeros(totalAgents, cfg.NumSteps + 1, 'uint8');
+    agentHistory.gridRow = zeros(totalAgents, cfg.NumSteps + 1, 'uint16');
+    agentHistory.gridColumn = zeros(totalAgents, cfg.NumSteps + 1, 'uint16');
+    agentHistory.status = zeros(totalAgents, cfg.NumSteps + 1, 'uint8');
+    agentHistory.floorIndex(:, 1) = agents.floor_index;
+    agentHistory.gridRow(:, 1) = agents.grid_row;
+    agentHistory.gridColumn(:, 1) = agents.grid_column;
+    agentHistory.status(:, 1) = agents.status;
+end
 
 [infected(1), nonInfected(1), escaped(1)] = countStates(agents, cfg);
 indoor(1) = infected(1) + nonInfected(1);
@@ -62,6 +73,12 @@ for step = 1:cfg.NumSteps
     [occupancyVisits, infectedVisits, floorPopulation(step + 1, :), stairQueue(step + 1, :), ...
         regularElevatorQueue(step + 1, :), greenElevatorQueue(step + 1, :)] = ...
         recordSpatialState(agents, building, cfg, occupancyVisits, infectedVisits);
+    if recordAgentHistory
+        agentHistory.floorIndex(:, step + 1) = agents.floor_index;
+        agentHistory.gridRow(:, step + 1) = agents.grid_row;
+        agentHistory.gridColumn(:, step + 1) = agents.grid_column;
+        agentHistory.status(:, step + 1) = agents.status;
+    end
 end
 
 result.scenarioName = scenarioName;
@@ -81,6 +98,9 @@ result.spatial.stairTransfers = stairTransfers;
 result.spatial.regularElevatorTransfers = regularElevatorTransfers;
 result.spatial.greenElevatorTransfers = greenElevatorTransfers;
 result.spatial.floorLabels = string({building.floors.floorLabel});
+if recordAgentHistory
+    result.agentHistory = agentHistory;
+end
 result.summary = table(scenarioName, totalAgents, infected(end), nonInfected(end), escaped(end), ...
     100 * escaped(end) / totalAgents, ...
     'VariableNames', {'scenario', 'initial_total', 'infected', 'non_infected', 'escaped', 'escape_rate_percent'});
