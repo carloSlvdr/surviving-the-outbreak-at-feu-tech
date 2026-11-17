@@ -22,8 +22,10 @@ end
 floorRoomRows = find(rooms.floor_index == floorIndex);
 physicalFloorId = cfg.PhysicalFloorIds(floorIndex);
 hasRightRooms = any(rooms.layout_band(floorRoomRows) == "right");
-placeBand("top", 2, 14);
-placeBand("bottom", 27, 39);
+% Room bands are intentionally inset from the transport core to preserve
+% door approaches and a continuous circulation hallway.
+placeBand("top", 2, 11);
+placeBand("bottom", 29, 39);
 
 areaRows = floorRoomRows(rooms.layout_band(floorRoomRows) == "area");
 if ~isempty(areaRows) && ismember(physicalFloorId, [2 8])
@@ -35,32 +37,42 @@ if ~isempty(areaRows) && ismember(physicalFloorId, [2 8])
 elseif ~isempty(areaRows) && physicalFloorId == 14
     % The drawing shows a full-width upper library and lower-right library.
     sourceRow = areaRows(1);
-    grid(2:13, 2:cols-1) = cfg.Cell.Room;
-    roomMap(2:13, 2:cols-1) = uint16(sourceRow);
-    grid(28:rows-1, 29:cols-1) = cfg.Cell.Room;
-    roomMap(28:rows-1, 29:cols-1) = uint16(sourceRow);
+    grid(2:11, 2:cols-1) = cfg.Cell.Room;
+    roomMap(2:11, 2:cols-1) = uint16(sourceRow);
+    grid(29:rows-1, 29:cols-1) = cfg.Cell.Room;
+    roomMap(29:rows-1, 29:cols-1) = uint16(sourceRow);
 else
     for k = 1:numel(areaRows)
         sourceRow = areaRows(k);
         left = 4 + (k - 1) * 24;
         right = min(left + 20, 54);
-        placeRoom(sourceRow, 3, 15, left, right, "bottom");
+        placeRoom(sourceRow, 3, 11, left, right, "bottom");
     end
 end
 
 rightRows = floorRoomRows(rooms.layout_band(floorRoomRows) == "right");
-for k = 1:numel(rightRows)
-    sourceRow = rightRows(k);
-    left = 39 + (k - 1) * 10;
-    right = min(left + 9, 58);
-    placeRoom(sourceRow, 14, 26, left, right, "left");
+if ~isempty(rightRows)
+    [~, order] = sort(rooms.layout_order(rightRows));
+    rightRows = rightRows(order);
+    rightEdges = round(linspace(39, 51, numel(rightRows) + 1));
+    for k = 1:numel(rightRows)
+        placeRoom(rightRows(k), 13, 27, rightEdges(k), rightEdges(k + 1) - 1, "top");
+    end
 end
 
 % Central corridor and eight regular elevator shafts drawn consistently on
 % every upper floor: a 3-by-2 bank plus a separate 1-by-2 bank.
-grid(19:21, 2:cols-1) = cfg.Cell.Walkable;
+% Clear dedicated hallway envelopes before placing any transport cells.
+grid(12:28, 11:38) = cfg.Cell.Walkable;
+grid(14:23, 51:cols-1) = cfg.Cell.Walkable;
+if hasRightRooms
+    grid(19:21, 2:38) = cfg.Cell.Walkable;
+    grid(19:21, 51:cols-1) = cfg.Cell.Walkable;
+else
+    grid(19:21, 2:cols-1) = cfg.Cell.Walkable;
+end
 regularColumns = {[13 16], [18 21], [23 26], [29 32]};
-regularRows = {[14 19], [22 27]};
+regularRows = {[14 18], [22 26]};
 for columnIndex = 1:numel(regularColumns)
     for rowIndex = 1:numel(regularRows)
         grid(regularRows{rowIndex}(1):regularRows{rowIndex}(2), ...

@@ -24,8 +24,13 @@ assert(nnz(floor2.roomMap) > 1500 && nnz(floor8.roomMap) > 1500);
 assert(nnz(floor14.roomMap) > 900);
 assert(nnz(floor2.grid == cfg.Cell.Exit) == 18);
 for floorIndex = 2:cfg.NumFloors
-    assert(nnz(building.floors(floorIndex).grid == cfg.Cell.RegularElevator) == 192);
+    floorGrid = building.floors(floorIndex).grid;
+    assert(nnz(floorGrid == cfg.Cell.RegularElevator) == 160);
     assert(nnz(building.floors(floorIndex).grid == cfg.Cell.GreenElevator) == 20);
+    transportMask = floorGrid == cfg.Cell.RegularElevator | floorGrid == cfg.Cell.GreenElevator;
+    transportMargin = conv2(double(transportMask), ones(3), 'same') > 0;
+    assert(~any(floorGrid(transportMargin) == cfg.Cell.Room));
+    assert(~any(floorGrid(transportMargin) == cfg.Cell.Door));
 end
 assert(~any(building.floors(1).grid(:) == cfg.Cell.Stair));
 assert(~any(building.floors(1).grid(:) == cfg.Cell.RegularElevator));
