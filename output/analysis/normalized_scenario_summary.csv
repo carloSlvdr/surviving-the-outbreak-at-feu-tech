@@ -1,0 +1,4 @@
+scenario,primary_infected,primary_non_infected,primary_escaped,primary_infection_rate_percent,primary_escape_rate_percent,three_seed_mean_infection_rate_percent,three_seed_std_infection_rate_percent,three_seed_mean_escape_rate_percent,three_seed_std_escape_rate_percent
+Second-Floor Outbreak,774,2853,86,20.8456773498519,2.31618637220576,22.6846556494475,1.94772771579589,3.06122370153642,1.09836442580057
+Eighth-Floor Outbreak,2881,591,241,77.5922434688931,6.4907083221115,72.3900295392747,16.9819544995089,5.15858184461839,1.18021601729486
+Sixteenth-Floor Outbreak,3204,300,209,86.2914085645031,5.62887153245354,86.2461148674995,1.57354178888875,5.81049410221276,0.350776859086084

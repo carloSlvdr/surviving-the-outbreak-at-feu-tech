@@ -18,7 +18,7 @@ for seed = seeds
 end
 replications = vertcat(rows{:});
 replications = movevars(replications, 'random_seed', 'Before', 'scenario');
-outputRoot = fullfile(projectRoot, "results", "authoritative_scenarios");
+outputRoot = fullfile(projectRoot, "results", "outbreak_origin_scenarios");
 writetable(replications, fullfile(outputRoot, "replicated_scenario_outcomes.csv"));
 
 scenarioNames = unique(replications.scenario, 'stable');

@@ -43,7 +43,7 @@ Run the three-seed comparison:
 matlab -batch "run('runReplications.m')"
 ```
 
-Outputs are written to `results/authoritative_scenarios`.
+Current outbreak-origin outputs are written to `results/outbreak_origin_scenarios`.
 
 ## Important limitation
 

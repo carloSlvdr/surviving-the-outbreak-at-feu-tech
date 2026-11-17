@@ -11,6 +11,6 @@
 | Agent placement | `outbreak.initializeGridAgents` |
 | Simulation | `outbreak.runGridScenario` |
 | Validation | `tests/run_all_tests.m` |
-| Primary outputs | `results/authoritative_scenarios` |
+| Primary outputs | `results/outbreak_origin_scenarios` |
 
 The framework exports population time series, final agents, floor metrics, occupancy and infection matrices, heat-map atlases, elevator and stair queue summaries, scenario comparisons, and replicated-run summaries.
