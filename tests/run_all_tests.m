@@ -19,6 +19,10 @@ assert(cfg.InfectedMovementProbability == 0.65 && cfg.InfectedPursuitProbability
 building = outbreak.buildBuildingModel(cfg, data);
 report = outbreak.validateBuildingModel(cfg, building, data);
 assert(all(report.framework_validation == "passed"));
+floor2 = building.floors(2); floor8 = building.floors(8); floor14 = building.floors(13);
+assert(nnz(floor2.roomMap) > 1500 && nnz(floor8.roomMap) > 1500);
+assert(nnz(floor14.roomMap) > 900);
+assert(nnz(floor2.grid == cfg.Cell.Exit) == 18);
 assert(~any(building.floors(1).grid(:) == cfg.Cell.Stair));
 assert(~any(building.floors(1).grid(:) == cfg.Cell.RegularElevator));
 

@@ -20,16 +20,32 @@ if floorIndex == 1
 end
 
 floorRoomRows = find(rooms.floor_index == floorIndex);
+physicalFloorId = cfg.PhysicalFloorIds(floorIndex);
 hasRightRooms = any(rooms.layout_band(floorRoomRows) == "right");
 placeBand("top", 2, 14);
 placeBand("bottom", 27, 39);
 
 areaRows = floorRoomRows(rooms.layout_band(floorRoomRows) == "area");
-for k = 1:numel(areaRows)
-    sourceRow = areaRows(k);
-    left = 4 + (k - 1) * 24;
-    right = min(left + 20, 54);
-    placeRoom(sourceRow, 3, 15, left, right, "bottom");
+if ~isempty(areaRows) && ismember(physicalFloorId, [2 8])
+    % The Student Plaza and requirement-defined Canteen are open occupied
+    % floors rather than small rooms. Distribute occupants across the floor.
+    sourceRow = areaRows(1);
+    grid(2:rows-1, 2:cols-1) = cfg.Cell.Room;
+    roomMap(2:rows-1, 2:cols-1) = uint16(sourceRow);
+elseif ~isempty(areaRows) && physicalFloorId == 14
+    % The drawing shows a full-width upper library and lower-right library.
+    sourceRow = areaRows(1);
+    grid(2:13, 2:cols-1) = cfg.Cell.Room;
+    roomMap(2:13, 2:cols-1) = uint16(sourceRow);
+    grid(28:rows-1, 29:cols-1) = cfg.Cell.Room;
+    roomMap(28:rows-1, 29:cols-1) = uint16(sourceRow);
+else
+    for k = 1:numel(areaRows)
+        sourceRow = areaRows(k);
+        left = 4 + (k - 1) * 24;
+        right = min(left + 20, 54);
+        placeRoom(sourceRow, 3, 15, left, right, "bottom");
+    end
 end
 
 rightRows = floorRoomRows(rooms.layout_band(floorRoomRows) == "right");
@@ -43,7 +59,6 @@ end
 % Central corridor and vertical transport drawn consistently on most plans.
 grid(19:21, 2:cols-1) = cfg.Cell.Walkable;
 grid(18:22, 27:32) = cfg.Cell.RegularElevator;
-physicalFloorId = cfg.PhysicalFloorIds(floorIndex);
 if ismember(physicalFloorId, [cfg.GreenElevatorConfirmedStops cfg.GreenElevatorInferredStops])
     grid(18:20, 35:37) = cfg.Cell.GreenElevator;
 end
@@ -52,7 +67,7 @@ grid(20, cols-3:cols-1) = cfg.Cell.Stair;
 
 % The Floor-2 Student Plaza entrance is the verified external boundary.
 if floorIndex == 2
-    grid(20, cols) = cfg.Cell.Exit;
+    grid(27:35, cols-1:cols) = cfg.Cell.Exit;
 end
 roomMap(grid ~= cfg.Cell.Room) = 0;
 

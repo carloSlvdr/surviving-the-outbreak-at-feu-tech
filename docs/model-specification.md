@@ -6,6 +6,8 @@ Every identified room receives one independent inclusive uniform occupancy draw.
 
 Agents move through four-neighbor traversable grid cells. Walls are impassable. Room doors are normalized toward the central corridor where the drawings do not show door openings. During evacuation, agents use the shortest grid distance toward stairs, regular elevators, a supported green-elevator stop, or an authorized exit boundary.
 
+Large-area floors use plan-specific occupied regions rather than the generic classroom-room template. Floor 2 distributes Student Plaza occupants across the open floor plate and exposes a visible lower-right entrance boundary. Floor 8 distributes Canteen occupants across the full usable floor. Floor 14 distributes Library occupants across the upper full-width and lower-right library regions shown in its drawing.
+
 Regular elevators and emergency stairs connect only the upper-floor sequence. They cannot reach Floor 1. The green-box elevator is the only modeled connection to Floor 1. Elevator capacity is 15 per car; eight regular cars and one green car are configured. Dispatch intervals are provisional operational abstractions.
 
 Both Non-Infected and Infected agents may become Escaped after crossing the Floor-2 entrance or Floor-1 exit. Escaped is terminal.

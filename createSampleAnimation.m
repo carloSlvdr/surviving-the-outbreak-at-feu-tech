@@ -35,7 +35,7 @@ infectedPlots = gobjects(cfg.NumFloors, 1);
 escapedPlots = gobjects(cfg.NumFloors, 1);
 
 mapColors = [0.08 0.10 0.12; 0.97 0.97 0.97; 0.88 0.84 0.73; ...
-    0.55 0.55 0.55; 0.43 0.66 0.82; 0.42 0.75 0.45; ...
+    0.55 0.55 0.55; 0.43 0.66 0.82; 1.00 0.62 0.05; ...
     0.84 0.75 0.57; 0.75 0.75 0.75; 0.34 0.72 0.45];
 colormap(fig, mapColors);
 
@@ -43,6 +43,7 @@ for floorIndex = 1:cfg.NumFloors
     ax = nexttile(layout, floorIndex);
     axesHandles(floorIndex) = ax;
     imagesc(ax, double(building.floors(floorIndex).grid) + 1);
+    clim(ax, [1 9]);
     hold(ax, 'on');
     nonInfectedPlots(floorIndex) = scatter(ax, nan, nan, 7, [0.12 0.45 0.90], 'filled');
     infectedPlots(floorIndex) = scatter(ax, nan, nan, 12, [0.88 0.10 0.12], 'filled');
