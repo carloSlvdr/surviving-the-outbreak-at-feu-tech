@@ -1,6 +1,8 @@
 # Migration record - authoritative 15-floor model
 
-Date: 2026-11-16
+Initial migration: 2026-11-16
+
+Final documentation review: 2026-11-18
 
 - Replaced the 16-level sequence with physical floors 1-12 and 14-16.
 - Removed Floor 17 and prohibited Floor 13.
@@ -11,7 +13,8 @@ Date: 2026-11-16
 - Restricted Floor-1 access to the green-box elevator and made the absent ground geometry explicitly provisional.
 - Added the Floor-2 Student Plaza entrance as the second authorized escape boundary.
 - Added evidence and uncertainty records for mislabeled, incomplete, or conflicting drawings.
-- Wrote new outputs under `results/authoritative_scenarios`; older `results/grid_scenarios` outputs are obsolete.
+- Replaced the former evacuation-timing scenarios with the three outbreak-origin scenarios and wrote the current detailed outputs under `results/outbreak_origin_scenarios`.
+- Reserved `output/` for the tracked submission artifacts; older `results/grid_scenarios` and `results/authoritative_scenarios` runs are historical and are not referenced by the final documentation.
 - Replaced proximity-only infection with aggressive pursuit, a 12% bite opportunity per adjacent infected agent, a 35% per-update cap, and guaranteed infection after a successful bite.
 
-The current normalized grids are drawing-derived topological reconstructions, not scale architectural plans.
+The current normalized grids are drawing-derived topological reconstructions, not scale architectural plans. The final repository retains the current MATLAB implementation, final report, selected visual outputs, and scenario animations while excluding reproducible detailed results and private source plans from Git.

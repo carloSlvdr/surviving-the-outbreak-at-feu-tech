@@ -1,8 +1,7 @@
-# Floor grid files
+# Generated floor-grid files
 
-Run `buildModelFramework` to generate the current sixteen placeholder `.mat` grids.
+The active model contains 15 normalized 40-by-60 floor grids for physical floors `[1:12, 14:16]`.
 
-Every grid file contains a `uint8` occupancy matrix named `grid` and a `metadata` structure containing its floor label, function, reference status, layout source, and grid source.
+Run either `buildModelFramework` or `runGridProject` to construct and validate the current grids. Grid generation is implemented by `src/+outbreak/createPlanDerivedGrid.m`; generated `.mat` files are ignored because they are reproducible from the tracked source and data tables.
 
-Generated placeholders are software-development assets only. Replace them with digitized layouts as verified floor plans become available, while preserving the cell-code definitions in `config/defaultConfig.m`.
-
+Each grid uses the cell codes defined in `config/defaultConfig.m` and preserves drawing-derived topology and relative placement. The grids are not placeholder architectural plans and do not claim measured scale. Floor 1 is provisional, and Floor 12 is explicitly derived from the revised Floor 11 plan pending an independently verified drawing.

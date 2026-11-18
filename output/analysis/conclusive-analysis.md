@@ -62,11 +62,10 @@ The result supports prioritizing early isolation and connector control for outbr
 ## Visual outputs
 
 - [Conclusive dashboard](outbreak_origin_conclusive_dashboard.png)
-- [Primary outcome comparison](../../results/outbreak_origin_scenarios/scenario_outcome_comparison.png)
-- [Three-seed comparison](../../results/outbreak_origin_scenarios/replicated_scenario_comparison.png)
-- [Floor 2 population progression](../../results/outbreak_origin_scenarios/second_floor_outbreak/population_progression.png)
-- [Floor 8 population progression](../../results/outbreak_origin_scenarios/eighth_floor_outbreak/population_progression.png)
-- [Floor 16 population progression](../../results/outbreak_origin_scenarios/sixteenth_floor_outbreak/population_progression.png)
+- [Complete Word report](../documents/Surviving_the_Outbreak_at_FEU_Tech_Complete_Model_Analysis.docx)
+- [Complete PDF report](../pdf/Surviving_the_Outbreak_at_FEU_Tech_Complete_Model_Analysis.pdf)
+
+The detailed comparison graphs, progression charts, infected-presence heat maps, floor-time heat maps, and transport summaries are embedded in both complete reports. Their reproducible source outputs are generated locally under `results/outbreak_origin_scenarios/`.
 
 ## Scenario animations
 

@@ -295,7 +295,7 @@ The framework can produce:
 - Static floor-layout images.
 - Recorded agent-position animations.
 
-Existing analytical results generated before the latest Floor 12 population and geometry changes should be considered stale until the three scenarios are rerun.
+The submitted analytical outputs were regenerated after the Floor 12 population and geometry changes. Historical outputs in older result directories are superseded; the supported analysis uses `results/outbreak_origin_scenarios` and the final artifacts in `output/`.
 
 ## Confirmed facts versus provisional assumptions
 

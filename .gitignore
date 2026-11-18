@@ -4,6 +4,8 @@
 *.autosave
 slprj/
 codegen/
+__pycache__/
+*.pyc
 
 # Generated simulation outputs
 results/
@@ -19,6 +21,3 @@ tmp/
 # Operating-system files
 Thumbs.db
 .DS_Store
-
-# Superseded report generated from the retired 16-floor model
-output/pdf/Surviving_the_Outbreak_FEU_Tech_Conclusive_Analysis.pdf

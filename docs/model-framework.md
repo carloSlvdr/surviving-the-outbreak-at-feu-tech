@@ -12,5 +12,6 @@
 | Simulation | `outbreak.runGridScenario` |
 | Validation | `tests/run_all_tests.m` |
 | Primary outputs | `results/outbreak_origin_scenarios` |
+| Final tracked deliverables | `output/` |
 
-The framework exports population time series, final agents, floor metrics, occupancy and infection matrices, heat-map atlases, elevator and stair queue summaries, scenario comparisons, and replicated-run summaries.
+The framework exports population time series, final agents, floor metrics, occupancy and infection matrices, heat-map atlases, elevator and stair queue summaries, scenario comparisons, replicated-run summaries, layout previews, and MP4 animations. Detailed run data are reproducible and ignored by Git; the final reports and selected presentation artifacts are tracked under `output/`.

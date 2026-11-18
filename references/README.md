@@ -1,10 +1,12 @@
 # Local reference files
 
-Architectural floor plans and the original proposal are kept under `references/private/` and excluded from the public repository. This avoids publishing potentially sensitive building layouts while still allowing local grid digitization and traceability.
+Source proposals and architectural drawings are stored under `references/private/` and excluded from the public repository. This avoids publishing the original building documents while preserving local traceability for grid reconstruction.
 
-Expected local files:
+The local reference set may include:
 
-- `references/private/FinalProjectProposal.pdf`
-- `references/private/Venue Floor Plans Compilation Deck.pptx.pdf`
+- `FinalProjectProposal.pdf`
+- `Venue Floor Plans Compilation Deck.pptx.pdf`
+- the later hand-drawn floor-plan images in `floorplans_20261116/`
+- the revised Floor 11 drawing and any supplemental floor images
 
-Derived grid files must record their source document, page number, digitization method, and verification status without copying the source PDF into Git.
+The active model follows the later hand-drawn floor plans and the revised Floor 11 plan when they conflict with earlier maps. Floor 12 is a user-directed derivation of Floor 11 until an independently verified Floor 12 drawing is supplied. Derived grids record source and uncertainty information in `data/geometry_evidence.csv` without copying private source files into Git.
