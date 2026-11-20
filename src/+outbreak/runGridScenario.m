@@ -61,7 +61,7 @@ for step = 1:cfg.NumSteps
         greenElevatorTransfers(step, :)] = moveAgents(agents, building, cfg, ...
         evacuationActive, distanceMaps, step);
     hoursSinceEvacuation = max(0, currentHour - evacuationStartHour);
-    [agents, newBites(step + 1)] = infectAdjacentAgents(agents, cfg, building, ...
+    [agents, newBites(step + 1)] = infectAdjacentAgents(agents, cfg, ...
         evacuationActive, hoursSinceEvacuation);
     if evacuationActive
         agents = processAuthorizedExits(agents, cfg, building);
@@ -235,7 +235,7 @@ end
 newRow = candidates(selected, 1); newColumn = candidates(selected, 2);
 end
 
-function [agents, successfulBites] = infectAdjacentAgents(agents, cfg, building, evacuationActive, hoursSinceEvacuation)
+function [agents, successfulBites] = infectAdjacentAgents(agents, cfg, evacuationActive, hoursSinceEvacuation)
 infectedMaps = false(cfg.GridRows, cfg.GridColumns, cfg.NumFloors);
 infectedRows = find(agents.status == cfg.Status.Infected);
 for agentIndex = infectedRows'

@@ -1,6 +1,6 @@
 # Submission checklist
 
-Final review date: 2026-11-18
+Final review date: 2026-11-20
 
 ## Repository checks
 
@@ -15,7 +15,7 @@ Final review date: 2026-11-18
 
 ## Validation checks
 
-- [x] `matlab -batch "run('tests/run_all_tests.m')"` passes.
+- [x] `matlab -batch "run('tests/runAllTests.m')"` passes.
 - [x] Population conservation is asserted during every simulation update.
 - [x] Every occupied space has a valid occupancy range and reachable walkable cells.
 - [x] Floor 11 and the user-directed Floor 12 derivation have matching geometry.

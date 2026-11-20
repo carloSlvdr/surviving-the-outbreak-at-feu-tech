@@ -32,7 +32,7 @@
       "label": "MATLAB: Run tests",
       "type": "shell",
       "command": "matlab",
-      "args": ["-batch", "run('tests/run_all_tests.m')"],
+      "args": ["-batch", "run('tests/runAllTests.m')"],
       "options": {"cwd": "${workspaceFolder}"},
       "group": "test",
       "problemMatcher": []

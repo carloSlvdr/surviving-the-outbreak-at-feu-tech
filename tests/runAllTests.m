@@ -1,4 +1,4 @@
-%RUN_ALL_TESTS Validate the authoritative fifteen-floor implementation.
+%RUNALLTESTS Validate the authoritative fifteen-floor implementation.
 projectRoot = string(fileparts(fileparts(mfilename('fullpath'))));
 addpath(fullfile(projectRoot, "config")); addpath(fullfile(projectRoot, "src"));
 cfg = defaultConfig(); data = outbreak.loadProjectData(projectRoot);

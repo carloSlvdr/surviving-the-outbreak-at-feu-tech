@@ -350,4 +350,4 @@ The submitted analytical outputs were regenerated after the Floor 12 population 
 - Agent initialization: `src/+outbreak/initializeGridAgents.m`
 - Scenario execution: `src/+outbreak/runGridScenario.m`
 - Bite calculation: `src/+outbreak/computeBiteProbability.m`
-- Validation tests: `tests/run_all_tests.m`
+- Validation tests: `tests/runAllTests.m`

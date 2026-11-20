@@ -10,7 +10,7 @@
 | Population generation | `outbreak.generateRoomOccupancy` |
 | Agent placement | `outbreak.initializeGridAgents` |
 | Simulation | `outbreak.runGridScenario` |
-| Validation | `tests/run_all_tests.m` |
+| Validation | `tests/runAllTests.m` |
 | Primary outputs | `results/outbreak_origin_scenarios` |
 | Final tracked deliverables | `output/` |
 
