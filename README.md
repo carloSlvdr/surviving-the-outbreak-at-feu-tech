@@ -2,6 +2,45 @@
 
 Agent-based MATLAB simulation of a fictional zombie outbreak inside FEU Tech. The model compares how the initial infected location changes infection spread, congestion, vertical movement, and evacuation outcomes.
 
+## How to run the project
+
+### Requirements
+
+- MATLAB (tested with R2026a)
+- a writable project directory for generated `results/`
+- no external MATLAB libraries are required
+
+VS Code users can install the recommended MathWorks MATLAB extension and use the tasks in `.vscode/tasks.json`.
+
+Open MATLAB in the repository root and run:
+
+```matlab
+runGridProject
+```
+
+Alternatively, run the project from a PowerShell terminal opened in the repository root:
+
+```powershell
+matlab -batch "runGridProject"
+```
+
+The complete run can take time because it simulates three 24-hour scenarios and renders three MP4 animations. Do not close MATLAB or the terminal while the command is still processing.
+
+### What the user receives after running
+
+The primary command validates the building model and simulates the same 3,713 occupants under three outbreak origins: Floor 2, Floor 8, and Floor 16. It produces:
+
+- final `Infected`, `Non-Infected`, and `Escaped` totals for each scenario;
+- final agent states and grid positions in CSV format;
+- population time-series data and progression graphs;
+- occupancy and infected-presence heat-map atlases;
+- floor population-over-time heat maps;
+- stair, elevator, transfer, and queue statistics;
+- a comparison CSV and graph for the three scenarios; and
+- one MP4 outbreak animation per scenario.
+
+Detailed generated results are written to `results/outbreak_origin_scenarios/`, while the animations are written to `output/animation/`. A normal model run does not generate a Word or PDF report; the reports already stored under `output/documents/` and `output/pdf/` are prepared submission artifacts.
+
 ## Submission status
 
 The repository was re-audited and is ready for submission as of 2026-11-20. The automated model tests pass for the recorded 3,713-agent primary population, and the final report, figures, layouts, and three scenario animations are available under `output/`.
@@ -21,7 +60,7 @@ This is a comparative academic simulation, not an operational emergency plan. Bu
 - stairs, eight regular elevators, and the green elevator represented separately
 - adjacency-based bite transmission with entrapment pressure after four evacuation hours
 
-Floors 13 and 17 are excluded. Floor 12 is a user-directed derivation of the revised Floor 11 plan and is clearly marked as not independently verified. Floor 1 is provisional because no authoritative Ground Floor drawing was supplied.
+Floor 11 plan and is clearly marked as not independently verified. Floor 1 is provisional because no authoritative Ground Floor drawing was supplied.
 
 ## Latest recorded model outcomes
 
@@ -81,32 +120,6 @@ The tracked submission outputs include:
 - the matching PDF report under `output/pdf/`.
 
 Running `runReplications` additionally produces the recorded three-seed outcomes, scenario means, standard deviations, and replication comparison graph under `results/outbreak_origin_scenarios/`.
-
-## Requirements
-
-- MATLAB (tested with R2026a)
-- a writable project directory for generated `results/`
-- no external MATLAB libraries are required
-
-Regenerating the optional Word report requires Python 3.10 or newer and the package listed in `scripts/requirements-report.txt`. The completed DOCX and PDF are already included, so Python is not required to run or submit the MATLAB model.
-
-VS Code users can install the recommended MathWorks MATLAB extension and use the tasks in `.vscode/tasks.json`.
-
-## Quick start
-
-Open MATLAB in the repository root and run:
-
-```matlab
-runGridProject
-```
-
-Or run from PowerShell:
-
-```powershell
-matlab -batch "runGridProject"
-```
-
-This command validates the model, executes all three 24-hour scenarios, writes detailed outputs to `results/outbreak_origin_scenarios/`, and creates one MP4 animation per scenario in `output/animation/`.
 
 ## Validation and reproducibility
 
@@ -175,12 +188,6 @@ All functions below are called through the `outbreak` namespace.
 | `src/+outbreak/writeScenarioComparison.m` | Creates the primary-run cross-scenario outcome comparison. |
 | `src/+outbreak/writeScenarioAnimation.m` | Renders recorded agent histories into the final all-floor MP4 animation. |
 
-## Optional report utility
-
-| File | Purpose |
-|---|---|
-| `scripts/createCompleteAnalysisReport.py` | Rebuilds the Word analysis report from the current MATLAB results and tracked figures. |
-
 ## Repository structure
 
 | Path | Contents |
@@ -194,13 +201,3 @@ All functions below are called through the `outbreak` namespace.
 | `results/` | Detailed generated runs; intentionally ignored by Git because they are reproducible |
 | `references/private/` | Local source plans and proposal; intentionally excluded from the public repository |
 
-## Important interpretation limits
-
-- The 40-by-60 floor grids preserve topology and relative placement, not architectural scale.
-- Bite, pursuit, movement, stair, elevator, and exit parameters are provisional simulation assumptions.
-- Only three replication seeds are included; at least 30 are recommended for formal uncertainty estimates.
-- The current implementation can classify infected agents as `Escaped`; escape counts are therefore not confirmed survivor counts.
-- Regular elevator capacity is aggregated by source floor instead of tracking individual cars.
-- Entrapment pressure uses global elapsed evacuation time rather than each agent's personal waiting time.
-
-See `docs/model-factors-criteria-and-facts.md` for the full authoritative parameter record and `output/analysis/conclusive-analysis.md` for the supported findings.
